@@ -16,6 +16,7 @@ template(name="memberMenuPopup")
       li: a.js-change-settings {{_ 'change-settings'}}
       li: a.js-change-avatar {{_ 'edit-avatar'}}
       li: a.js-change-password {{_ 'changePasswordPopup-title'}}
+      li: a.js-manage-sso {{_ 'manageSsoPopup-title'}}
       li: a.js-change-language {{_ 'changeLanguagePopup-title'}}
       li: a.js-edit-notification {{_ 'editNotificationPopup-title'}}
     if currentUser.isAdmin
@@ -88,3 +89,6 @@ template(name="changeSettingsPopup")
         | {{_ 'show-cards-minimum-count'}}
       input#show-cards-count-at.inline-input.left(type="number" value="#{showCardsCountAt}" min="1" max="99" onkeydown="return false")
       input.js-apply-show-cards-at.left(type="submit" value="{{_ 'apply'}}")
+
+template(name="manageSsoPopup")
+  +atOauth

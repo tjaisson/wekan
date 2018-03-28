@@ -10,6 +10,7 @@ Template.memberMenuPopup.events({
   'click .js-change-password': Popup.open('changePassword'),
   'click .js-change-language': Popup.open('changeLanguage'),
   'click .js-edit-notification': Popup.open('editNotification'),
+  'click .js-manage-sso': Popup.open('manageSso'),
   'click .js-logout'(evt) {
     evt.preventDefault();
 
@@ -170,4 +171,10 @@ Template.changeSettingsPopup.events({
       Popup.back();
     }
   },
+});
+
+Template.manageSsoPopup.helpers({
+	  entuser() {
+	    return JSON.stringify(Meteor.user());
+	  },
 });

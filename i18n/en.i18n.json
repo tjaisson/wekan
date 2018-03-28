@@ -188,6 +188,7 @@
     "editCardSpentTimePopup-title": "Change spent time",
     "editLabelPopup-title": "Change Label",
     "editNotificationPopup-title": "Edit Notification",
+    "manageSsoPopup-title": "ENT connections",
     "editProfilePopup-title": "Edit Profile",
     "email": "Email",
     "email-enrollAccount-subject": "An account created for you on __siteName__",
