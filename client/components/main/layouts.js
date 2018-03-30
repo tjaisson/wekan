@@ -6,6 +6,40 @@ const i18nTagToT9n = (i18nTag) => {
   return i18nTag;
 };
 
+Template.atSocial.helpers({
+		buttonText() {
+    var service = this;
+    var serviceName = this._id;
+    if (serviceName === "meteor-developer")
+        serviceName = "meteor";
+    if (serviceName === "entcoremln")
+        serviceName = "MonLycée.net";
+    if (serviceName === "entcorepcn")
+        serviceName = "PCN";
+    //serviceName = capitalize(serviceName);
+    if (!service.configured)
+        return T9n.get(AccountsTemplates.texts.socialConfigure, markIfMissing=false) + " " + serviceName;
+    var showAddRemove = AccountsTemplates.options.showAddRemoveServices;
+    var user = Meteor.user();
+    if (user && showAddRemove){
+        if (user.services && user.services[this._id]){
+            var numServices = _.keys(user.services).length; // including "resume"
+            if (numServices === 2)
+                return serviceName;
+            else
+                return T9n.get(AccountsTemplates.texts.socialRemove, markIfMissing=false) + " " + serviceName;
+        } else
+                return T9n.get(AccountsTemplates.texts.socialAdd, markIfMissing=false) + " " + serviceName;
+    }
+    var parentData = Template.parentData();
+    var state = (parentData && parentData.state) || AccountsTemplates.getState();
+    var prefix = state === "signIn" ?
+        T9n.get(AccountsTemplates.texts.socialSignIn, markIfMissing=false) :
+        T9n.get(AccountsTemplates.texts.socialSignUp, markIfMissing=false);
+    return prefix + " " + T9n.get(AccountsTemplates.texts.socialWith, markIfMissing=false) + " " + serviceName;
+}
+});
+
 Template.userFormsLayout.onRendered(() => {
   const i18nTag = navigator.language;
   if (i18nTag) {
