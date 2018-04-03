@@ -436,5 +436,11 @@
     "accounts-allowEmailChange": "Autoriser le changement d'adresse mail",
     "createdAt": "Créé à",
     "verified": "Vérifié",
-    "active": "Actif"
+    "active": "Actif",
+    "card-received": "Reçue",
+    "card-received-on": "Reçue le",
+    "card-end": "Fin",
+    "card-end-on": "Se termine le",
+    "editCardReceivedDatePopup-title": "Changer la date de réception",
+    "editCardEndDatePopup-title": "Changer la date de fin"
 }

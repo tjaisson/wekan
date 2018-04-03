@@ -435,5 +435,11 @@
     "accounts-allowEmailChange": "اجازه تغییر رایانامه",
     "createdAt": "ساخته شده در",
     "verified": "معتبر",
-    "active": "فعال"
+    "active": "فعال",
+    "card-received": "رسیده",
+    "card-received-on": "رسیده در",
+    "card-end": "پایان",
+    "card-end-on": "پایان در",
+    "editCardReceivedDatePopup-title": "تغییر تاریخ رسید",
+    "editCardEndDatePopup-title": "تغییر تاریخ پایان"
 }

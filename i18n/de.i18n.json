@@ -435,5 +435,11 @@
     "accounts-allowEmailChange": "Ändern der E-Mailadresse zulassen",
     "createdAt": "Erstellt am",
     "verified": "Geprüft",
-    "active": "Aktiv"
+    "active": "Aktiv",
+    "card-received": "Empfangen",
+    "card-received-on": "Empfangen am",
+    "card-end": "Ende",
+    "card-end-on": "Endet am",
+    "editCardReceivedDatePopup-title": "Empfangsdatum ändern",
+    "editCardEndDatePopup-title": "Enddatum ändern"
 }

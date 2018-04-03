@@ -435,5 +435,11 @@
     "accounts-allowEmailChange": "Permitir cambiar el correo electrónico",
     "createdAt": "Creado en",
     "verified": "Verificado",
-    "active": "Activo"
+    "active": "Activo",
+    "card-received": "Recibido",
+    "card-received-on": "Recibido el",
+    "card-end": "Termina",
+    "card-end-on": "Termina el",
+    "editCardReceivedDatePopup-title": "Cambiar la fecha de recepción",
+    "editCardEndDatePopup-title": "Cambiar la fecha de finalización"
 }
