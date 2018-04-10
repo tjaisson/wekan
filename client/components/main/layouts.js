@@ -7,7 +7,7 @@ const i18nTagToT9n = (i18nTag) => {
 };
 
 Template.atSocial.helpers({
-		buttonText() {
+		buttonText_not() {
     var service = this;
     var serviceName = this._id;
     if (serviceName === "meteor-developer")
