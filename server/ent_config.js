@@ -1,10 +1,2 @@
-(function() {
-	var options = {
-		'service': 'entcoremln',
-		'loginStyle' : 'popup',
-		'clientId' : '',
-		'secret' : '',
-			
-	};
-	//ServiceConfiguration.configurations.insert(options);
-})();
+//EntCore.configureService(Meteor.settings.mln.appId, Meteor.settings.mln.secret);
+EntCore.configureService('mln', 'test-tj-meteor', 'moncodesecret');
