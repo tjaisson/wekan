@@ -1,3 +1,86 @@
+# v0.89 2018-04-29 Wekan release
+
+This release fixes the following bugs:
+
+- [Fix Wekan import / Export for
+   ChecklistItems](https://github.com/wekan/wekan/commit/30b17ff6c92df07922f875071e864cf688902293).
+
+Thanks to Github user zebby76 for contributions.
+
+# v0.88 2018-04-27 Wekan release
+
+This release fixes the following bugs:
+
+- [Fix Trello import of ChecklistItems](https://github.com/wekan/wekan/pull/1611).
+
+Thanks to Github user zebby76 for contributions.
+
+# v0.87 2018-04-27 Wekan release
+
+This release fixes the following bugs:
+
+- [Sandstorm: Copy Card, Move Card and Copy Checklist Template to Many Cards - No longer works in
+   menu](https://github.com/wekan/wekan/commit/db80e738048e2729917c5e8fc18cf8ee44df7992);
+- [Snap: Use override-build instead of old deprecated
+   prepare/build/install](https://github.com/wekan/wekan/commit/075ea1c43d827099e0030c750a4c156bd3340fed);
+- [Removed not-used plugins part of Caddy download
+   URL](https://github.com/wekan/wekan/commit/7b91b341fe9c0cde42f91bf14d228820653c883d).
+
+Thanks to GitHub users kyrofa and xet7 for their contributions.
+
+# v0.86 2018-04-20 Wekan release
+
+This release adds the following new features:
+
+- Updated translations: German and Turkish;
+- Updated Caddy to newest version for Snap.
+
+Thanks to translators and Caddy developers.
+
+# v0.85 2018-04-18 Wekan release
+
+This release fixes the following bugs:
+
+- [Fix Switch List/swimlane view only working with admin privileges](https://github.com/wekan/wekan/issues/1567);
+- [Fix Wekan logo positioning](https://github.com/wekan/wekan/issues/1378);
+- [Fix checklists items migration error "title is required"](https://github.com/wekan/wekan/issues/1576);
+- [Removed paxctl alpine fix #1303 , because it did not work anymore, so Docker container
+   did not build correctly](https://github.com/wekan/wekan/commit/ce659632174ba25ca9b5e85b053fde02fd9c3928);
+- [Use curl to download 100% CPU fibers fixed node in snap, and remove paxctl from
+   snap package](https://github.com/wekan/wekan/commit/179ff7a12457be1592f04e1bdc15a5bb4fe9d398).
+
+Thanks to GitHub users andresmanelli, iwkse and xet7 for their contributions.
+
+# v0.84 2018-04-16 Wekan release
+
+This release adds the following new features:
+
+- [Add Checklist Items REST API](https://github.com/wekan/wekan/commit/9eef5112dc1c1c30590d19fbfd2f615714112a3f).
+
+and fixes the following bugs:
+
+- [Fix Node Fibers 100% CPU issue](https://github.com/wekan/wekan/commit/e26a4824cfb119a15767c4827190a6b9ab65b904);
+- [Plus button on a Swimlane row, always add an element on the first row](https://github.com/wekan/wekan/issues/1577);
+- [Fix Checklist REST API](https://github.com/wekan/wekan/commit/9eef5112dc1c1c30590d19fbfd2f615714112a3f);
+- [Fix Disabling "show cards count" not possible, now zero means disable](https://github.com/wekan/wekan/issues/1570);
+- [Fix Checklist not copied when copied a card and Copy Checklist Template to Many Cards](https://github.com/wekan/wekan/issues/1565);
+- [Fix Filter cards hides checklist items](https://github.com/wekan/wekan/issues/1561).
+
+Thanks to GitHub users andresmanelli, kentonv and xet7 for their contributions.
+
+# v0.83 2018-04-12 Wekan release
+
+- Updated translations: Czech and French.
+
+Thanks to translators!
+
+# v0.82 2018-04-11 Wekan release
+
+- [Restore original font and font sizes. Admin panel people and version texts
+  to darker](https://github.com/wekan/wekan/commit/db74c86e555f45a5aaaef84d2f3d4128cec77782).
+
+Thanks to GitHub users apn3a and xet7 for their contributions.
+
 # v0.81 2018-04-10 Wekan release
 
 This release adds the following new features:
