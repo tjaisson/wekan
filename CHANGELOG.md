@@ -1,11 +1,66 @@
+# v0.95 2018-05-08 Wekan release
+
+This release adds the following new features:
+
+* [REST API Edit Card Labels](https://github.com/wekan/wekan/pull/1626);
+* [Add a new API route to create a new label in a given board](https://github.com/wekan/wekan/pull/1630);
+* [Admin Panel: Option to block username change](https://github.com/wekan/wekan/pull/1627).
+
+and fixed the following bugs:
+
+* [Error: title is required](https://github.com/wekan/wekan/issues/1576).
+    
+Thanks to GitHub users Shahar-Y, thiagofernando and ThisNeko for their contributions.
+
+# v0.94 2018-05-03 Wekan release
+
+This release adds the following new features:
+
+* [REST API POST /cards: allow setting card members](https://github.com/wekan/wekan/pull/1622).
+
+Thanks to GitHub user couscous3 for contributions.
+
+# v0.93 2018-05-02 Wekan release
+
+This release adds the following new features:
+
+* [Checklist items lineheight to 18px, and positioning
+   improvements](https://github.com/wekan/wekan/issues/1619).
+
+Thanks to GitHub user lichtamberg for contributions.
+
+# v0.92 2018-05-01 Wekan release
+
+This release tries to fix the following bugs, please test:
+
+* [Users who register with an invitation code can't see lists/cards](https://github.com/wekan/wekan/issues/1610).
+
+Thanks to GitHub user andresmanelli for contributions.
+
+# v0.91 2018-05-01 Wekan release
+
+This release fixes the following bugs:
+
+- [Fix Wekan Import / Export lists not being sortable](https://github.com/wekan/wekan/commit/539c1ab87a098a7ddfd23cdbd663441bd609b73d).
+
+Thanks to GitHub user zebby76 for contributions.
+
+# v0.90 2018-05-01 Wekan release
+
+This release adds the following new features:
+
+- [Remove space from between checklist items, so longer checklists can be seen
+   at once](https://github.com/wekan/wekan/commit/1124f4120cd77622c0a6313e228e1a00690ff566).
+
+Thanks to GitHub user xet7 for contributions.
+
 # v0.89 2018-04-29 Wekan release
 
 This release fixes the following bugs:
 
-- [Fix Wekan import / Export for
-   ChecklistItems](https://github.com/wekan/wekan/commit/30b17ff6c92df07922f875071e864cf688902293).
+- [Fix Wekan import / Export for ChecklistItems](https://github.com/wekan/wekan/pull/1613).
 
-Thanks to Github user zebby76 for contributions.
+Thanks to GitHub user zebby76 for contributions.
 
 # v0.88 2018-04-27 Wekan release
 
@@ -13,7 +68,7 @@ This release fixes the following bugs:
 
 - [Fix Trello import of ChecklistItems](https://github.com/wekan/wekan/pull/1611).
 
-Thanks to Github user zebby76 for contributions.
+Thanks to GitHub user zebby76 for contributions.
 
 # v0.87 2018-04-27 Wekan release
 
@@ -43,7 +98,7 @@ This release fixes the following bugs:
 
 - [Fix Switch List/swimlane view only working with admin privileges](https://github.com/wekan/wekan/issues/1567);
 - [Fix Wekan logo positioning](https://github.com/wekan/wekan/issues/1378);
-- [Fix checklists items migration error "title is required"](https://github.com/wekan/wekan/issues/1576);
+- [Tried to fix, but fix did not work: Fix checklists items migration error "title is required"](https://github.com/wekan/wekan/issues/1576);
 - [Removed paxctl alpine fix #1303 , because it did not work anymore, so Docker container
    did not build correctly](https://github.com/wekan/wekan/commit/ce659632174ba25ca9b5e85b053fde02fd9c3928);
 - [Use curl to download 100% CPU fibers fixed node in snap, and remove paxctl from
