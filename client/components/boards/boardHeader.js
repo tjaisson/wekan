@@ -17,6 +17,12 @@ Template.boardMenuPopup.events({
     // confirm that the board was successfully archived.
     FlowRouter.go('home');
   }),
+  'click .js-delete-board': Popup.afterConfirm('deleteBoard', function() {
+    const currentBoard = Boards.findOne(Session.get('currentBoard'));
+    Popup.close();
+    Boards.remove(currentBoard._id);
+    FlowRouter.go('home');
+  }),
   'click .js-outgoing-webhooks': Popup.open('outgoingWebhooks'),
   'click .js-import-board': Popup.open('chooseBoardSource'),
 });
@@ -83,9 +89,11 @@ BlazeComponent.extendComponent({
       'click .js-toggle-board-view'() {
         const currentUser = Meteor.user();
         if (currentUser.profile.boardView === 'board-view-swimlanes') {
-          currentUser.setBoardView('board-view-lists');
+          currentUser.setBoardView('board-view-cal');
         } else if (currentUser.profile.boardView === 'board-view-lists') {
           currentUser.setBoardView('board-view-swimlanes');
+        } else if (currentUser.profile.boardView === 'board-view-cal') {
+          currentUser.setBoardView('board-view-lists');
         }
       },
       'click .js-open-filter-view'() {

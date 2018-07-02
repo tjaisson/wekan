@@ -21,8 +21,12 @@ BlazeComponent.extendComponent({
 
   onCreated() {
     this.isLoaded = new ReactiveVar(false);
-    this.parentComponent().parentComponent().showOverlay.set(true);
-    this.parentComponent().parentComponent().mouseHasEnterCardDetails = false;
+    const boardBody =  this.parentComponent().parentComponent();
+    //in Miniview parent is Board, not BoardBody.
+    if (boardBody !== null){
+      boardBody.showOverlay.set(true);
+      boardBody.mouseHasEnterCardDetails = false;
+    }
     this.calculateNextPeak();
 
     Meteor.subscribe('unsaved-edits');
@@ -44,7 +48,8 @@ BlazeComponent.extendComponent({
   scrollParentContainer() {
     const cardPanelWidth = 510;
     const bodyBoardComponent = this.parentComponent().parentComponent();
-
+    //On Mobile View Parent is Board, Not Board Body. I cant see how this funciton should work then.
+    if (bodyBoardComponent === null) return;
     const $cardView = this.$(this.firstNode());
     const $cardContainer = bodyBoardComponent.$('.js-swimlanes');
     const cardContainerScroll = $cardContainer.scrollLeft();
@@ -115,7 +120,10 @@ BlazeComponent.extendComponent({
   },
 
   onDestroyed() {
-    this.parentComponent().parentComponent().showOverlay.set(false);
+    const parentComponent =  this.parentComponent().parentComponent();
+    //on mobile view parent is Board, not board body.
+    if (parentComponent === null) return;
+    parentComponent.showOverlay.set(false);
   },
 
   events() {
@@ -146,6 +154,20 @@ BlazeComponent.extendComponent({
           this.data().setTitle(title);
         }
       },
+      'submit .js-card-details-assigner'(evt) {
+        evt.preventDefault();
+        const assigner = this.currentComponent().getValue().trim();
+        if (assigner) {
+          this.data().setAssignedBy(assigner);
+        }
+      },
+      'submit .js-card-details-requester'(evt) {
+        evt.preventDefault();
+        const requester = this.currentComponent().getValue().trim();
+        if (requester) {
+          this.data().setRequestedBy(requester);
+        }
+      },
       'click .js-member': Popup.open('cardMember'),
       'click .js-add-members': Popup.open('cardMembers'),
       'click .js-add-labels': Popup.open('cardLabels'),
@@ -154,8 +176,11 @@ BlazeComponent.extendComponent({
       'click .js-due-date': Popup.open('editCardDueDate'),
       'click .js-end-date': Popup.open('editCardEndDate'),
       'mouseenter .js-card-details' () {
-        this.parentComponent().parentComponent().showOverlay.set(true);
-        this.parentComponent().parentComponent().mouseHasEnterCardDetails = true;
+        const parentComponent =  this.parentComponent().parentComponent();
+        //on mobile view parent is Board, not BoardBody.
+        if (parentComponent === null) return;
+        parentComponent.showOverlay.set(true);
+        parentComponent.mouseHasEnterCardDetails = true;
       },
       'click #toggleButton'() {
         Meteor.call('toggleSystemMessages');
@@ -215,8 +240,8 @@ Template.cardDetailsActionsPopup.events({
   'click .js-members': Popup.open('cardMembers'),
   'click .js-labels': Popup.open('cardLabels'),
   'click .js-attachments': Popup.open('cardAttachments'),
-  'click .js-received-date': Popup.open('editCardReceivedDate'),
   'click .js-custom-fields': Popup.open('cardCustomFields'),
+  'click .js-received-date': Popup.open('editCardReceivedDate'),
   'click .js-start-date': Popup.open('editCardStartDate'),
   'click .js-due-date': Popup.open('editCardDueDate'),
   'click .js-end-date': Popup.open('editCardEndDate'),
@@ -259,6 +284,32 @@ Template.editCardTitleForm.events({
     // Unless the shift key is also being pressed
     if (evt.keyCode === 13 && !evt.shiftKey) {
       $('.js-submit-edit-card-title-form').click();
+    }
+  },
+});
+
+Template.editCardRequesterForm.onRendered(function() {
+  autosize(this.$('.js-edit-card-requester'));
+});
+
+Template.editCardRequesterForm.events({
+  'keydown .js-edit-card-requester'(evt) {
+    // If enter key was pressed, submit the data
+    if (evt.keyCode === 13) {
+      $('.js-submit-edit-card-requester-form').click();
+    }
+  },
+});
+
+Template.editCardAssignerForm.onRendered(function() {
+  autosize(this.$('.js-edit-card-assigner'));
+});
+
+Template.editCardAssignerForm.events({
+  'keydown .js-edit-card-assigner'(evt) {
+    // If enter key was pressed, submit the data
+    if (evt.keyCode === 13) {
+      $('.js-submit-edit-card-assigner-form').click();
     }
   },
 });

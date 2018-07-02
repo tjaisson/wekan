@@ -10,12 +10,22 @@ template(name="minicard")
       +viewer
         = title
     .dates
+      if receivedAt
+        unless startAt
+          unless dueAt
+            unless endAt
+              .date
+                +minicardReceivedDate
       if startAt
         .date
           +minicardStartDate
       if dueAt
+        unless endAt
+          .date
+            +minicardDueDate
+      if endAt
         .date
-          +minicardDueDate
+          +minicardEndDate
       if spentTime
         .date
           +cardSpentTime
@@ -27,7 +37,8 @@ template(name="minicard")
             .minicard-custom-field-item
               = definition.name
             .minicard-custom-field-item
-              = value
+              +viewer
+                = trueValue
 
     if members
       .minicard-members.js-minicard-members

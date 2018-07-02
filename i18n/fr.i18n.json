@@ -100,6 +100,7 @@
     "boardMenuPopup-title": "Menu du tableau",
     "boards": "Tableaux",
     "board-view": "Vue du tableau",
+    "board-view-cal": "Calendrier",
     "board-view-swimlanes": "Couloirs",
     "board-view-lists": "Listes",
     "bucket-example": "Comme « todo list » par exemple",
@@ -248,7 +249,7 @@
     "filter-on-desc": "Vous êtes en train de filtrer les cartes sur ce tableau. Cliquez ici pour modifier les filtres.",
     "filter-to-selection": "Filtre vers la sélection",
     "advanced-filter-label": "Filtre avancé",
-    "advanced-filter-description": "Le filtre avancé permet d'écrire une chaîne contenant les opérateur suivants : == != <= >= && || ( ). Les opérateurs doivent être séparés par des espaces. Vous pouvez filtrer tous les champs personnalisés en saisissant leur nom et leur valeur. Par exemple : champ1 == valeur1. Note : si des champs ou valeurs contiennent des espaces, vous devez les mettre entre apostrophes. Par exemple : 'champ 1' = 'valeur 1'. Il est également possible de combiner plusieurs conditions. Par exemple : f1 == v1 || f2 == v2. Normalement, tous les opérateurs sont interprétés de gauche à droite. Vous pouvez changer l'ordre à l'aide de parenthèses. Par exemple : f1 == v1 and (f2 == v2 || f2 == v3).",
+    "advanced-filter-description": "Le filtre avancé permet d'écrire une chaîne contenant les opérateur suivants : == != <= >= && || ( ). Les opérateurs doivent être séparés par des espaces. Vous pouvez filtrer tous les champs personnalisés en saisissant leur nom et leur valeur. Par exemple : champ1 == valeur1. Remarque : si des champs ou valeurs contiennent des espaces, vous devez les mettre entre apostrophes. Par exemple : 'champ 1' = 'valeur 1'. Pour échapper un caractère de contrôle (' \\/), vous pouvez utiliser \\. Par exemple : champ1 = I\\'m. Il est également possible de combiner plusieurs conditions. Par exemple : f1 == v1 || f2 == v2. Normalement, tous les opérateurs sont interprétés de gauche à droite. Vous pouvez changer l'ordre à l'aide de parenthèses. Par exemple : f1 == v1 and (f2 == v2 || f2 == v3). Vous pouvez également chercher parmi les champs texte en utilisant des expressions régulières : f1 == /Test.*/i",
     "fullname": "Nom complet",
     "header-logo-title": "Retourner à la page des tableaux",
     "hide-system-messages": "Masquer les messages système",
@@ -469,5 +470,11 @@
     "card-end": "Fin",
     "card-end-on": "Se termine le",
     "editCardReceivedDatePopup-title": "Changer la date de réception",
-    "editCardEndDatePopup-title": "Changer la date de fin"
+    "editCardEndDatePopup-title": "Changer la date de fin",
+    "assigned-by": "Assigné par",
+    "requested-by": "Demandé par",
+    "board-delete-notice": "La suppression est définitive. Vous perdrez toutes vos listes, cartes et actions associées à ce tableau.",
+    "delete-board-confirm-popup": "Toutes les listes, cartes, étiquettes et activités seront supprimées et vous ne pourrez pas retrouver le contenu du tableau. Il n'y a pas d'annulation possible.",
+    "boardDeletePopup-title": "Supprimer le tableau ?",
+    "delete-board": "Supprimer le tableau"
 }

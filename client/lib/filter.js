@@ -109,12 +109,20 @@ class AdvancedFilter {
     const commands = [];
     let current = '';
     let string = false;
+    let regex = false;
     let wasString = false;
     let ignore = false;
     for (let i = 0; i < this._filter.length; i++) {
       const char = this._filter.charAt(i);
       if (ignore) {
         ignore = false;
+        current += char;
+        continue;
+      }
+      if (char === '/'){
+        string = !string;
+        if (string) regex = true;
+        current += char;
         continue;
       }
       if (char === '\'') {
@@ -122,12 +130,12 @@ class AdvancedFilter {
         if (string) wasString = true;
         continue;
       }
-      if (char === '\\') {
+      if (char === '\\' && !string) {
         ignore = true;
         continue;
       }
       if (char === ' ' && !string) {
-        commands.push({ 'cmd': current, 'string': wasString });
+        commands.push({ 'cmd': current, 'string': wasString, regex});
         wasString = false;
         current = '';
         continue;
@@ -135,7 +143,7 @@ class AdvancedFilter {
       current += char;
     }
     if (current !== '') {
-      commands.push({ 'cmd': current, 'string': wasString });
+      commands.push({ 'cmd': current, 'string': wasString, regex});
     }
     return commands;
   }
@@ -143,6 +151,22 @@ class AdvancedFilter {
   _fieldNameToId(field) {
     const found = CustomFields.findOne({ 'name': field });
     return found._id;
+  }
+
+  _fieldValueToId(field, value)
+  {
+    const found = CustomFields.findOne({ 'name': field });
+    if (found.settings.dropdownItems && found.settings.dropdownItems.length > 0)
+    {
+      for (let i = 0; i < found.settings.dropdownItems.length; i++)
+      {
+        if (found.settings.dropdownItems[i].name === value)
+        {
+          return found.settings.dropdownItems[i]._id;
+        }
+      }
+    }
+    return value;
   }
 
   _arrayToSelector(commands) {
@@ -208,7 +232,20 @@ class AdvancedFilter {
         {
           const field = commands[i - 1].cmd;
           const str = commands[i + 1].cmd;
-          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': str };
+          if (commands[i + 1].regex)
+          {
+            const match = str.match(new RegExp('^/(.*?)/([gimy]*)$'));
+            let regex = null;
+            if (match.length > 2)
+              regex = new RegExp(match[1], match[2]);
+            else
+              regex = new RegExp(match[1]);
+            commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': regex };
+          }
+          else
+          {
+            commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': {$in: [this._fieldValueToId(field, str), parseInt(str, 10)]} };
+          }
           commands.splice(i - 1, 1);
           commands.splice(i, 1);
           //changed = true;
@@ -220,7 +257,20 @@ class AdvancedFilter {
         {
           const field = commands[i - 1].cmd;
           const str = commands[i + 1].cmd;
-          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $not: str } };
+          if (commands[i + 1].regex)
+          {
+            const match = str.match(new RegExp('^/(.*?)/([gimy]*)$'));
+            let regex = null;
+            if (match.length > 2)
+              regex = new RegExp(match[1], match[2]);
+            else
+              regex = new RegExp(match[1]);
+            commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $not: regex } };
+          }
+          else
+          {
+            commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $not: {$in: [this._fieldValueToId(field, str), parseInt(str, 10)]} } };
+          }
           commands.splice(i - 1, 1);
           commands.splice(i, 1);
           //changed = true;
@@ -234,7 +284,7 @@ class AdvancedFilter {
         {
           const field = commands[i - 1].cmd;
           const str = commands[i + 1].cmd;
-          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $gt: str } };
+          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $gt: parseInt(str, 10) } };
           commands.splice(i - 1, 1);
           commands.splice(i, 1);
           //changed = true;
@@ -249,7 +299,7 @@ class AdvancedFilter {
         {
           const field = commands[i - 1].cmd;
           const str = commands[i + 1].cmd;
-          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $gte: str } };
+          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $gte:  parseInt(str, 10) } };
           commands.splice(i - 1, 1);
           commands.splice(i, 1);
           //changed = true;
@@ -263,7 +313,7 @@ class AdvancedFilter {
         {
           const field = commands[i - 1].cmd;
           const str = commands[i + 1].cmd;
-          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $lt: str } };
+          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $lt:  parseInt(str, 10) } };
           commands.splice(i - 1, 1);
           commands.splice(i, 1);
           //changed = true;
@@ -278,7 +328,7 @@ class AdvancedFilter {
         {
           const field = commands[i - 1].cmd;
           const str = commands[i + 1].cmd;
-          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $lte: str } };
+          commands[i] = { 'customFields._id': this._fieldNameToId(field), 'customFields.value': { $lte:  parseInt(str, 10) } };
           commands.splice(i - 1, 1);
           commands.splice(i, 1);
           //changed = true;

@@ -100,6 +100,7 @@
     "boardMenuPopup-title": "보드 메뉴",
     "boards": "보드",
     "board-view": "Board View",
+    "board-view-cal": "Calendar",
     "board-view-swimlanes": "Swimlanes",
     "board-view-lists": "목록들",
     "bucket-example": "예: “프로젝트 이름“ 입력",
@@ -108,7 +109,7 @@
     "card-comments-title": "이 카드에 %s 코멘트가 있습니다.",
     "card-delete-notice": "영구 삭제입니다. 이 카드와 관련된 모든 작업들을 잃게됩니다.",
     "card-delete-pop": "모든 작업이 활동 내역에서 제거되며 카드를 다시 열 수 없습니다. 복구가 안되니 주의하시기 바랍니다.",
-    "card-delete-suggest-archive": "You can move a card Recycle Bin to remove it from the board and preserve the activity.",
+    "card-delete-suggest-archive": "You can move a card to Recycle Bin to remove it from the board and preserve the activity.",
     "card-due": "종료일",
     "card-due-on": "종료일",
     "card-spent": "Spent Time",
@@ -247,7 +248,7 @@
     "filter-on-desc": "보드에서 카드를 필터링합니다. 여기를 클릭하여 필터를 수정합니다.",
     "filter-to-selection": "선택 항목으로 필터링",
     "advanced-filter-label": "Advanced Filter",
-    "advanced-filter-description": "Advanced Filter allows to write a string containing following operators: == != <= >= && || ( ) A space is used as a separator between the Operators. You can filter for all Custom Fields by typing their names and values. For Example: Field1 == Value1. Note: If fields or values contains spaces, you need to encapsulate them into single quotes. For Example: 'Field 1' == 'Value 1'. Also you can combine multiple conditions. For Example: F1 == V1 || F1 = V2. Normally all operators are interpreted from left to right. You can change the order by placing brackets. For Example: F1 == V1 and ( F2 == V2 || F2 == V3 )",
+    "advanced-filter-description": "Advanced Filter allows to write a string containing following operators: == != <= >= && || ( ) A space is used as a separator between the Operators. You can filter for all Custom Fields by typing their names and values. For Example: Field1 == Value1. Note: If fields or values contains spaces, you need to encapsulate them into single quotes. For Example: 'Field 1' == 'Value 1'. For single control characters (' \\/) to be skipped, you can use \\. For example: Field1 == I\\'m. Also you can combine multiple conditions. For Example: F1 == V1 || F1 == V2. Normally all operators are interpreted from left to right. You can change the order by placing brackets. For Example: F1 == V1 && ( F2 == V2 || F2 == V3 ). Also you can search text fields using regex: F1 == /Tes.*/i",
     "fullname": "실명",
     "header-logo-title": "보드 페이지로 돌아가기.",
     "hide-system-messages": "시스템 메시지 숨기기",
@@ -468,5 +469,11 @@
     "card-end": "End",
     "card-end-on": "Ends on",
     "editCardReceivedDatePopup-title": "Change received date",
-    "editCardEndDatePopup-title": "Change end date"
+    "editCardEndDatePopup-title": "Change end date",
+    "assigned-by": "Assigned By",
+    "requested-by": "Requested By",
+    "board-delete-notice": "Deleting is permanent. You will lose all lists, cards and actions associated with this board.",
+    "delete-board-confirm-popup": "All lists, cards, labels, and activities will be deleted and you won't be able to recover the board contents. There is no undo.",
+    "boardDeletePopup-title": "Delete Board?",
+    "delete-board": "Delete Board"
 }

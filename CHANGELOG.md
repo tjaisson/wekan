@@ -1,3 +1,130 @@
+# v1.11 2018-06-30 Wekan release
+
+This release fixes the following bugs:
+
+* [Remove card shadow](https://github.com/wekan/wekan/pull/1726), Wekan users now prefer not to have it;
+* [Revert](https://github.com/wekan/wekan/commit/928d88cfe1da4187797519c929cd2fdd9ffe9c2e) previous
+  [Less margin-bottom after minicard](https://github.com/wekan/wekan/pull/1713).
+
+Thanks to GitHub users pravdomil and xet7 for their contributions.
+
+# v1.10 2018-06-28 Wekan release
+
+This release fixes the following bugs:
+
+* Fix migration error "TypeError: Checklists.foreach" at [Snap](https://github.com/wekan/wekan-snap/issues/51),
+  [Docker](https://github.com/wekan/wekan/issues/1736) etc.
+
+Thanks to GitHub users Jubi94, kestrelhawk and xet7 for their contributions.
+
+# v1.09 2018-06-28 Wekan release
+
+This release adds the following new features:
+
+* [Calendar](https://github.com/wekan/wekan/pull/1728). Click Lists / Swimlanes / Calendar.
+
+and fixes the following bugs:
+
+* To fix ["title is required"](https://github.com/wekan/wekan/issues/1576) fix only
+  [add-checklist-items and revert all other migration changes](https://github.com/wekan/wekan/issues/1734);
+* [Restore invitation code logic](https://github.com/wekan/wekan/pull/1732). Please test and add comment
+  to those invitation code issues that this fixes. 
+
+Thanks to GitHub users TNick and xet7 for their contributions.
+
+# v1.08 2018-06-27 Wekan release
+
+This release adds the following new features:
+
+* [Add more card inner shadow](https://github.com/wekan/wekan/commit/6a587299b80a49fce0789628ff65885b5ed2c837);
+* [Less margin-bottom after minicard](https://github.com/wekan/wekan/pull/1713);
+* Updated newest node fork binary from Sandstorm to Wekan, see https://releases.wekan.team/node.txt
+* Add Georgian language.
+
+and fixes the following bugs:
+
+* [Fix typo in English translation](https://github.com/wekan/wekan/pull/1710);
+* [Fix vertical align of user avatar initials](https://github.com/wekan/wekan/pull/1714);
+* [Submit inline form on click outside](https://github.com/wekan/wekan/pull/1717), fixes
+  ["You have an unsaved description" doesn't go away after saving](https://github.com/wekan/wekan/issues/1287);
+* [Fix "Error: title is required" by removing find() from all of migrations](https://github.com/wekan/wekan/commit/97922c90cb42be6c6615639bb164173748982f56).
+
+Thanks to GitHub users pravdomil, xet7 and zypA13510 for their contributions.
+
+# v1.07 2018-06-14 Wekan release
+
+This release adds the following new features:
+
+* [Regex for Advanced filter. It aims to solve search in bigger text fields, and using wildcards.
+   A change to translations was made for adding info about regex and escaping characters
+   with \\](https://github.com/wekan/wekan/pull/1702).
+
+Thanks to GitHub users feuerball11 and xet7 for their contributions.
+
+# v1.06 2018-06-14 Wekan release
+
+This release fixes the following bugs:
+
+* [Fix CardDetail of Mobile View](https://github.com/wekan/wekan/pull/1701).
+
+Thanks to GitHub users feuerball11 and xet7 for their contributions.
+
+# v1.05 2018-06-14 Wekan release
+
+This release adds the following new features:
+
+* [Markdown support in Custom Fields, and view on minicard](https://github.com/wekan/wekan/pull/1699);
+* [Fixes to Advanced Filter, you are now able to filter for Dropdown and Numbers,
+   also Dropdown are now correctly displayed on minicard](https://github.com/wekan/wekan/pull/1699).
+
+and fixes the following bugs:
+
+* [Fix data colour changes on cards](https://github.com/wekan/wekan/pull/1698);
+* [Fix for migration error "title is required" and breaking of Standalone and
+   Sandstorm Wekan](https://github.com/wekan/wekan/commit/8d5cbf1e6c2b6d467fe1c0708cd794fd11b98a2e#commitcomment-29362180);
+* [Fix Issue with custom fields shown on card](https://github.com/wekan/wekan/issues/1659);
+* [Fix showing public board in list mode](https://github.com/wekan/wekan/issues/1623);
+* [Fix for not able to remove Custom Field "Show on Card"](https://github.com/wekan/wekan/pull/1699);
+* [Fix minicardReceivedDate typo in 1.04 regression: Socket connection error and boards
+   not loading](https://github.com/wekan/wekan/issues/1694).
+
+Thanks to GitHub users feuerball11, Fran-KTA, oec, rjevnikar and xet7 for their contributions.
+
+# v1.04 2018-06-12 Wekan release
+
+This release adds the following new features:
+
+* [Add Khmer language](https://github.com/wekan/wekan/commit/2156e458690d0dc34a761a48fd7fa3b54af79031);
+* [Change label text colour to black for specific label colours for better
+   visibility](https://github.com/wekan/wekan/pull/1689).
+
+and fixes the following bugs:
+
+* [SECURITY FIX: Do not publish all of people collection. This bug has probably been present
+   since addition of Admin Panel](https://github.com/wekan/wekan/commit/dda49d2f07f9c50d5d57acfd5c7eee6492f93b33);
+* [Modify card covers/mini-cards so that: 1) received date is shown unless there is a start date
+   2) due date is shown, unless there is an end date](https://github.com/wekan/wekan/pull/1685).
+
+Thanks to GitHub users rjevnikar and xet7 for their contributions.
+Thanks to Adrian Genaid for security fix, he's now added to [Hall of Fame](https://wekan.github.io/hall-of-fame/).
+Thanks to translators.
+
+# v1.03 2018-06-08 Wekan release
+
+This release adds the following new features:
+
+* [Update to newest Sandstorm fork of Node.js that includes performance
+   etc fixes](https://github.com/wekan/wekan/commit/90d55777f7298d243ed0de03c934cea239a31272);
+* [Additional label colors. Assigned By and Requested By text fields
+   on card. Delete board from Recycle Bin](https://github.com/wekan/wekan/pull/1679).
+
+and possibly fixes the following bugs, please test:
+
+* [Try to fix: Missing board-view-lists Field after DB updated to
+   Wekan 1.02](https://github.com/wekan/wekan/issues/1675).
+
+Thanks to GitHub users JamesLavin, rjevnikar and xet7 for their contributions.
+
 # v1.02 2018-05-26 Wekan release
 
 This release fixes the following bugs:
