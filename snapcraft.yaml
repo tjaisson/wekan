@@ -1,7 +1,7 @@
 name: wekan
 version: 0
 version-script: git describe --dirty --tags |  cut -c 2-
-summary: The open-source Trello-like kanban
+summary: The open-source kanban
 description: |
    Wekan is an open-source and collaborative kanban board application.
 
@@ -81,7 +81,7 @@ parts:
     wekan:
         source: .
         plugin: nodejs
-        node-engine: 8.11.1
+        node-engine: 8.11.3
         node-packages:
             - npm
             - node-gyp
@@ -108,9 +108,9 @@ parts:
             # Also see beginning of wekan/server/authentication.js
             #   import Fiber from "fibers";
             #   Fiber.poolSize = 1e9;
-            # Download node version 8.11.1 that has fix included, node binary copied from Sandstorm
+            # Download node version 8.12.0 prerelease build,
             # Description at https://releases.wekan.team/node.txt
-            echo "13baa1b3114a5ea3248875e0f36cb46fcf8acd212de1fb74ba68ef4c9a4e1d93  node" >> node-SHASUMS256.txt.asc
+            echo "375bd8db50b9c692c0bbba6e96d4114cd29bee3770f901c1ff2249d1038f1348  node" >> node-SHASUMS256.txt.asc
             curl https://releases.wekan.team/node -o node
             # Verify Fibers patched node authenticity
             echo "Fibers 100% CPU issue patched node authenticity:"
@@ -128,12 +128,20 @@ parts:
             chmod +x install_meteor.sh
             sh install_meteor.sh
             rm install_meteor.sh
-            mkdir packages
-            cd packages
-            git clone --depth 1 -b master https://github.com/wekan/flow-router.git kadira-flow-router
-            git clone --depth 1 -b master https://github.com/meteor-useraccounts/core.git meteor-useraccounts-core
-            sed -i 's/api\.versionsFrom/\/\/api.versionsFrom/' meteor-useraccounts-core/package.js
-            cd ..
+            if [ ! -d "packages" ]; then
+              mkdir packages
+            fi
+            if [ ! -d "packages/kadira-flow-router" ]; then
+              cd packages
+              git clone --depth 1 -b master https://github.com/wekan/flow-router.git kadira-flow-router
+              cd ..
+            fi
+            if [ ! -d "packages/meteor-useraccounts-core" ]; then
+              cd packages
+              git clone --depth 1 -b master https://github.com/meteor-useraccounts/core.git meteor-useraccounts-core
+              sed -i 's/api\.versionsFrom/\/\/api.versionsFrom/' meteor-useraccounts-core/package.js
+              cd ..
+            fi
             rm -rf package-lock.json .build
             meteor add standard-minifier-js --allow-superuser
             meteor npm install --allow-superuser
@@ -168,7 +176,7 @@ parts:
 
     caddy:
         plugin: dump
-        source: https://caddyserver.com/download/linux/amd64?license=personal
+        source: https://caddyserver.com/download/linux/amd64?plugins=http.filter,http.ipfilter,http.realip&license=personal&telemetry=off
         source-type: tar
         organize:
           caddy: bin/caddy

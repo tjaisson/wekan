@@ -154,16 +154,7 @@ Migrations.add('add-sort-checklists', () => {
 
 Migrations.add('add-swimlanes', () => {
   Boards.find().forEach((board) => {
-    const swimlane = Swimlanes.findOne({ boardId: board._id });
-    let swimlaneId = '';
-    if (swimlane)
-      swimlaneId = swimlane._id;
-    else
-      swimlaneId = Swimlanes.direct.insert({
-        boardId: board._id,
-        title: 'Default',
-      });
-
+    const swimlaneId = board.getDefaultSwimline()._id;
     Cards.find({ boardId: board._id }).forEach((card) => {
       if (!card.hasOwnProperty('swimlaneId')) {
         Cards.direct.update(
@@ -193,7 +184,7 @@ Migrations.add('add-checklist-items', () => {
     // Create new items
     _.sortBy(checklist.items, 'sort').forEach((item, index) => {
       ChecklistItems.direct.insert({
-        title: item.title,
+        title: (item.title ? item.title : 'Checklist'),
         sort: index,
         isFinished: item.isFinished,
         checklistId: checklist._id,
@@ -219,6 +210,18 @@ Migrations.add('add-profile-view', () => {
         noValidate
       );
     }
+  });
+});
+
+Migrations.add('add-card-types', () => {
+  Cards.find().forEach((card) => {
+    Cards.direct.update(
+      { _id: card._id },
+      { $set: {
+        type: 'cardType-card',
+        linkedId: null } },
+      noValidate
+    );
   });
 });
 
@@ -258,3 +261,63 @@ Migrations.add('add-assigner-field', () => {
   }, noValidateMulti);
 });
 
+Migrations.add('add-parent-field-to-cards', () => {
+  Cards.update({
+    parentId: {
+      $exists: false,
+    },
+  }, {
+    $set: {
+      parentId:'',
+    },
+  }, noValidateMulti);
+});
+
+Migrations.add('add-subtasks-boards', () => {
+  Boards.update({
+    subtasksDefaultBoardId: {
+      $exists: false,
+    },
+  }, {
+    $set: {
+      subtasksDefaultBoardId: null,
+      subtasksDefaultListId: null,
+    },
+  }, noValidateMulti);
+});
+
+Migrations.add('add-subtasks-sort', () => {
+  Boards.update({
+    subtaskSort: {
+      $exists: false,
+    },
+  }, {
+    $set: {
+      subtaskSort: -1,
+    },
+  }, noValidateMulti);
+});
+
+Migrations.add('add-subtasks-allowed', () => {
+  Boards.update({
+    allowsSubtasks: {
+      $exists: false,
+    },
+  }, {
+    $set: {
+      allowsSubtasks: true,
+    },
+  }, noValidateMulti);
+});
+
+Migrations.add('add-subtasks-allowed', () => {
+  Boards.update({
+    presentParentTask: {
+      $exists: false,
+    },
+  }, {
+    $set: {
+      presentParentTask: 'no-parent',
+    },
+  }, noValidateMulti);
+});

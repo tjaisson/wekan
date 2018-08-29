@@ -478,6 +478,30 @@ if (Meteor.isServer) {
       return user;
     }
 
+    if (user.services.oidc) {
+      const email = user.services.oidc.email.toLowerCase();
+
+      user.username = user.services.oidc.username;
+      user.emails = [{ address: email, verified: true }];
+      const initials = user.services.oidc.fullname.match(/\b[a-zA-Z]/g).join('').toUpperCase();
+      user.profile = { initials, fullname: user.services.oidc.fullname };
+
+      // see if any existing user has this email address or username, otherwise create new
+      const existingUser = Meteor.users.findOne({$or: [{'emails.address': email}, {'username':user.username}]});
+      if (!existingUser)
+        return user;
+
+      // copy across new service info
+      const service = _.keys(user.services)[0];
+      existingUser.services[service] = user.services[service];
+      existingUser.emails = user.emails;
+      existingUser.username = user.username;
+      existingUser.profile = user.profile;
+
+      Meteor.users.remove({_id: existingUser._id}); // remove existing record
+      return existingUser;
+    }
+
     if (options.from === 'admin') {
       user.createdThroughApi = true;
       return user;
@@ -501,9 +525,13 @@ if (Meteor.isServer) {
     } else {
       user.profile = {icode: options.profile.invitationcode};
       user.profile.boardView = 'board-view-lists';
-    }
 
-    return user;
+      // Deletes the invitation code after the user was created successfully.
+      setTimeout(Meteor.bindEnvironment(() => {
+        InvitationCodes.remove({'_id': invitationCode._id});
+      }), 200);
+      return user;
+    }
   });
 }
 
@@ -618,9 +646,20 @@ if (Meteor.isServer) {
   });
 }
 
-
 // USERS REST API
 if (Meteor.isServer) {
+  // Middleware which checks that API is enabled.
+  JsonRoutes.Middleware.use(function (req, res, next) {
+    const api = req.url.search('api');
+    if (api === 1 && process.env.WITH_API === 'true' || api === -1){
+      return next();
+    }
+    else {
+      res.writeHead(301, {Location: '/'});
+      return res.end();
+    }
+  });
+
   JsonRoutes.add('GET', '/api/user', function(req, res) {
     try {
       Authentication.checkLoggedIn(req.userId);

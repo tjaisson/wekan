@@ -151,6 +151,54 @@ Boards.attachSchema(new SimpleSchema({
     type: String,
     optional: true,
   },
+  subtasksDefaultBoardId: {
+    type: String,
+    optional: true,
+    defaultValue: null,
+  },
+  subtasksDefaultListId: {
+    type: String,
+    optional: true,
+    defaultValue: null,
+  },
+  allowsSubtasks: {
+    type: Boolean,
+    defaultValue: true,
+  },
+  presentParentTask: {
+    type: String,
+    allowedValues: [
+      'prefix-with-full-path',
+      'prefix-with-parent',
+      'subtext-with-full-path',
+      'subtext-with-parent',
+      'no-parent',
+    ],
+    optional: true,
+    defaultValue: 'no-parent',
+  },
+  startAt: {
+    type: Date,
+    optional: true,
+  },
+  dueAt: {
+    type: Date,
+    optional: true,
+  },
+  endAt: {
+    type: Date,
+    optional: true,
+  },
+  spentTime: {
+    type: Number,
+    decimal: true,
+    optional: true,
+  },
+  isOvertime: {
+    type: Boolean,
+    defaultValue: false,
+    optional: true,
+  },
 }));
 
 
@@ -184,6 +232,10 @@ Boards.helpers({
 
   isPublic() {
     return this.permission === 'public';
+  },
+
+  cards() {
+    return Cards.find({ boardId: this._id, archived: false }, { sort: { title: 1 } });
   },
 
   lists() {
@@ -264,29 +316,85 @@ Boards.helpers({
     return _id;
   },
 
-  searchCards(term) {
+  searchCards(term, excludeLinked) {
     check(term, Match.OneOf(String, null, undefined));
 
-    let query = { boardId: this._id };
+    const query = { boardId: this._id };
+    if (excludeLinked) {
+      query.linkedId = null;
+    }
     const projection = { limit: 10, sort: { createdAt: -1 } };
 
     if (term) {
       const regex = new RegExp(term, 'i');
 
-      query = {
-        boardId: this._id,
-        $or: [
-          { title: regex },
-          { description: regex },
-        ],
-      };
+      query.$or = [
+        { title: regex },
+        { description: regex },
+      ];
     }
 
     return Cards.find(query, projection);
   },
+  // A board alwasy has another board where it deposits subtasks of thasks
+  // that belong to itself.
+  getDefaultSubtasksBoardId() {
+    if ((this.subtasksDefaultBoardId === null) || (this.subtasksDefaultBoardId === undefined)) {
+      this.subtasksDefaultBoardId = Boards.insert({
+        title: `^${this.title}^`,
+        permission: this.permission,
+        members: this.members,
+        color: this.color,
+        description: TAPi18n.__('default-subtasks-board', {board: this.title}),
+      });
+
+      Swimlanes.insert({
+        title: TAPi18n.__('default'),
+        boardId: this.subtasksDefaultBoardId,
+      });
+      Boards.update(this._id, {$set: {
+        subtasksDefaultBoardId: this.subtasksDefaultBoardId,
+      }});
+    }
+    return this.subtasksDefaultBoardId;
+  },
+
+  getDefaultSubtasksBoard() {
+    return Boards.findOne(this.getDefaultSubtasksBoardId());
+  },
+
+  getDefaultSubtasksListId() {
+    if ((this.subtasksDefaultListId === null) || (this.subtasksDefaultListId === undefined)) {
+      this.subtasksDefaultListId = Lists.insert({
+        title: TAPi18n.__('queue'),
+        boardId: this._id,
+      });
+      Boards.update(this._id, {$set: {
+        subtasksDefaultListId: this.subtasksDefaultListId,
+      }});
+    }
+    return this.subtasksDefaultListId;
+  },
+
+  getDefaultSubtasksList() {
+    return Lists.findOne(this.getDefaultSubtasksListId());
+  },
+
+  getDefaultSwimline() {
+    let result = Swimlanes.findOne({boardId: this._id});
+    if (result === undefined) {
+      Swimlanes.insert({
+        title: TAPi18n.__('default'),
+        boardId: this._id,
+      });
+      result = Swimlanes.findOne({boardId: this._id});
+    }
+    return result;
+  },
 
   cardsInInterval(start, end) {
     return Cards.find({
+      boardId: this._id,
       $or: [
         {
           startAt: {
@@ -312,6 +420,7 @@ Boards.helpers({
   },
 
 });
+
 
 Boards.mutations({
   archive() {
@@ -433,6 +542,22 @@ Boards.mutations({
         [`members.${memberIndex}.isCommentOnly`]: isCommentOnly,
       },
     };
+  },
+
+  setAllowsSubtasks(allowsSubtasks) {
+    return { $set: { allowsSubtasks } };
+  },
+
+  setSubtasksDefaultBoardId(subtasksDefaultBoardId) {
+    return { $set: { subtasksDefaultBoardId } };
+  },
+
+  setSubtasksDefaultListId(subtasksDefaultListId) {
+    return { $set: { subtasksDefaultListId } };
+  },
+
+  setPresentParentTask(presentParentTask) {
+    return { $set: { presentParentTask } };
   },
 });
 

@@ -31,6 +31,7 @@ kenton:accounts-sandstorm
 service-configuration@1.0.11
 useraccounts:unstyled
 useraccounts:flow-routing
+salleman:accounts-oidc
 
 # Utilities
 check@1.2.5
@@ -49,7 +50,6 @@ kadira:dochead
 meteorhacks:picker
 meteorhacks:subs-manager
 mquandalle:autofocus
-mquandalle:moment
 ongoworks:speakingurl
 raix:handlebar-helpers
 tap:i18n
@@ -81,8 +81,11 @@ staringatlights:fast-render
 mixmax:smart-disconnect
 accounts-password@1.5.0
 cfs:gridfs
-browser-policy
 eluck:accounts-lockout
 tjaisson:accounts-entcore
 rzymek:fullcalendar
 momentjs:moment@2.22.2
+atoy40:accounts-cas
+browser-policy-framing
+mquandalle:moment
+msavin:usercache
