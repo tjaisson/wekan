@@ -89,3 +89,5 @@ atoy40:accounts-cas
 browser-policy-framing
 mquandalle:moment
 msavin:usercache
+tjaisson:accounts-entcore-ui
+tjaisson:accounts-entcore-direct
