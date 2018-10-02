@@ -4,11 +4,13 @@
 *.sublime-workspace
 tmp/
 node_modules/
+npm-debug.log
 .vscode/
 .idea/
 .build/*
 packages/kadira-flow-router/
 packages/meteor-useraccounts-core/
+packages/meteor-accounts-cas/
 package-lock.json
 **/parts/
 **/stage
@@ -16,3 +18,4 @@ package-lock.json
 **/*.snap
 snap/.snapcraft/
 .idea
+.DS_Store

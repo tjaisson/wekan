@@ -1,3 +1,141 @@
+# v1.52 2018-10-01 Wekan release
+
+This release removes the following new features:
+
+- [Removed CAS from Wekan stable](https://github.com/wekan/wekan/commit/5923585584f9cb8121476bf5e5d0abf7891e86f6),
+  because [it does not work correctly](https://github.com/wekan/wekan/issues/1925).
+  CAS developent continues at edge.
+
+Thanks to GitHub user xet7 for contributions.
+
+# v1.51 2018-09-28 Wekan release
+
+This release adds the following new features:
+
+- [Add CAS with attributes](https://github.com/wekan/wekan/commit/c6cea2fb4e9e17403fe0ce2ba5bf2d20dcf81a8f);
+- [Move Add Board button to top left, so there is no need to scroll to bottom when there is a lot of boards](https://github.com/wekan/wekan/commit/a10b6fb173d529220861668cfb1c341ec45e2a53).
+
+Thanks to GitHub users ppoulard and xet7 for their contributions.
+
+# v1.50 2018-09-22 Wekan release
+
+This release adds the following new features:
+
+- [Change from Node v8.12.0 prerelease to use official Node v8.12.0](https://github.com/wekan/wekan/commit/bfabd6346033c3d3887a4693de8f13bc1705b582).
+
+and fixes the following bugs:
+
+- [Fix Dockerfile Meteor install by changing tar to bsdtar](https://github.com/wekan/wekan/commit/352e9033b6efb212e65e34bb9c407bb1d7dce824);
+- Add [npm-debug.log](https://github.com/wekan/wekan/commit/f7731f4f5ec27e63e74a3265d105427ef3c0985a) and
+  [.DS_Store](https://github.com/wekan/wekan/commit/d652eb5cee3fd648a6023e38db444ad460ddef7e) to .gitignore;
+- [Add more debug log requirements to GitHub issue template](https://github.com/wekan/wekan/commit/94cd2ce69098f02e4ac4bebb1a2b5eaf919f1020);
+- [Add default Wekan Snap MongoDB bind IP 127.0.0.1](https://github.com/wekan/wekan/commit/12656ee9a13d2464cdc183590c76d3e09486c607).
+
+Thanks to GitHub users maurice-schleussinger and xet7 for their contributions.
+
+# v1.49 2018-09-17 Wekan release
+
+This release fixes the following bugs:
+
+- Fix lint errors.
+
+Thanks to GitHub user xet7 for contributions.
+
+# v1.48 2018-09-17 Wekan release
+
+This release removes the following new features:
+
+- Remove IFTTT rules, until they are fixed.
+- Remove OAuth2, until it is fixed.
+
+Thanks to GitHub user xet7 for contributions.
+
+# v1.47 2018-09-16 Wekan release
+
+This release adds the following new features:
+
+- [IFTTT Rules](https://github.com/wekan/wekan/pull/1896). Useful to automate things like
+  [adding labels, members, moving card, archiving them, checking checklists etc](https://github.com/wekan/wekan/issues/1160).
+  Please test and report bugs. Later colors need to be made translatable.
+
+Thanks to GitHub users Angtrim and xet7 for their contributions.
+
+# v1.46 2018-09-15 Wekan release
+
+This release adds the following new features:
+
+- [Upgrade MongoDB to 3.2.21](https://github.com/wekan/wekan/commit/0cb3aee803781e4241c38a3e1e700703d063035a);
+- [Add source-map-support](https://github.com/wekan/wekan/issues/1889);
+- [Allow Announcement to be markdown](https://github.com/wekan/wekan/issues/1892).
+  Note: xet7 did not yet figure out how to keep announcement on one line
+  when markdown was added, so now Font Awesome icons are above and below.
+
+and fixes the following bugs:
+
+- [Turn of http/2 in Caddyfile](https://github.com/wekan/wekan/commit/f1ab46d5178b6fb7e9c4e43628eec358026d287a)
+  so that Firefox Inspect Console does not [show errors about wss](https://github.com/wekan/wekan/issues/934)
+  websocket config. Chrome web console supports http/2.
+  Note: If you are already using Caddy and have modified your Caddyfile, you need to edit your Caddyfile manually.
+- [Partially fix: Cannot move card from one swimline to the other if moving in the same list](https://github.com/wekan/wekan/issues/1887);
+- [Fix: Linking cards from empty board is possible and makes current board not load anymore](https://github.com/wekan/wekan/issues/1885).
+
+Thanks to GitHub users andresmanelli, HLFH and xet7 for their contributions.
+
+# v1.45 2018-09-09 Wekan release
+
+This release fixes the following bugs:
+
+- [Fix lint error](https://github.com/wekan/wekan/commit/45c0343f45b4cfc06d83cf357ffb50d6fca2f23b).
+
+Thanks to GitHub user xet7 for contributions.
+
+# v1.44 2018-09-09 Wekan release
+
+This release adds the following new features:
+
+- REST API: [Add startAt/dueAt/endAt etc](https://github.com/wekan/wekan/commit/1e0fdf8abc10130ea3c50b13ae97396223ce7fa9).
+  Docs at https://github.com/wekan/wekan/wiki/REST-API-Cards
+- [Fix cards export and add customFields export](https://github.com/wekan/wekan/pull/1886).
+
+Thanks to GitHub users ymeramees and xet7 for their contributions.
+
+# v1.43 2018-09-06 Wekan release
+
+This release fixes the following bugs:
+
+- [Fix "No Comments" permission on Wekan and Trello import](https://github.com/wekan/wekan/commit/0a001d505d81961e6bd6715d885fffee0adb702d).
+
+Thanks to GitHub user xet7 for contributions.
+
+# v1.42 2018-09-06 Wekan release
+
+This release adds the following new features:
+
+- REST API: [Create board options to be modifiable](https://github.com/wekan/wekan/commit/9cea76e4efaacaebcb2e9f0690dfeb4ef6d62527),
+  like permissions, public/private board - now private by default,
+  and board background color.
+  Docs at https://github.com/wekan/wekan/wiki/REST-API-Boards
+- [Add swimlaneId in activity. Create default swimlaneId in API](https://github.com/wekan/wekan/pull/1876).
+
+Thanks to GitHub users andresmanelli and xet7 for their contributions.
+
+# v1.41 2018-09-05 Wekan release
+
+This release tries to fix the following bugs:
+
+- [Try to fix Wekan Sandstorm API](https://github.com/wekan/wekan/issues/1279#issuecomment-418440401).
+
+Thanks to GitHub users ocdtrekkie and xet7 for their contributions.
+
+# v1.40 2018-09-04 Wekan release
+
+This release adds the following new features:
+
+- [Add permission "No comments"](https://github.com/wekan/wekan/commit/77efcf71376d3da6c19ad1a4910567263e83c0ca).
+  It is like normal user, but [does not show comments and activities](https://github.com/wekan/wekan/issues/1861).
+
+Thanks to GitHub user xet7 for contributions.
+
 # v1.39 2018-08-29 Wekan release
 
 This release fixes the following bugs:
