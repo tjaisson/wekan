@@ -1,3 +1,3 @@
 EntcoreDirect.home = 'home';
-EntcoreDirect.layout = 'defaultLayout';
+EntcoreDirect.layout = 'userFormsLayout';
 EntcoreDirect.contentRegion = 'content';
