@@ -1,3 +1,3 @@
-EntcoreDirect.home = 'home';
-EntcoreDirect.layout = 'defaultLayout';
-EntcoreDirect.contentRegion = 'content';
+EntcoreUi.home = 'home';
+EntcoreUi.layout = 'defaultLayout';
+EntcoreUi.contentRegion = 'content';
