@@ -1,0 +1,1 @@
+EntcoreUi.home = 'home';

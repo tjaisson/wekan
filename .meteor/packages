@@ -83,3 +83,7 @@ staringatlights:flow-router
 mixmax:smart-disconnect
 accounts-password@1.5.0
 cfs:gridfs
+tjaisson:accounts-entcore
+tjaisson:accounts-entcore-ui
+tjaisson:accounts-entcore-direct
+tjaisson:accounts-entcore-multi
