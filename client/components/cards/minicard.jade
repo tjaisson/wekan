@@ -1,13 +1,26 @@
 template(name="minicard")
   .minicard(
     class="{{#if isLinkedCard}}linked-card{{/if}}"
-    class="{{#if isLinkedBoard}}linked-board{{/if}}")
+    class="{{#if isLinkedBoard}}linked-board{{/if}}"
+    class="minicard-{{colorClass}}")
+    if isMiniScreen
+      .handle
+        .fa.fa-arrows
+    unless isMiniScreen
+      if showDesktopDragHandles
+        .handle
+          .fa.fa-arrows
     if cover
       .minicard-cover(style="background-image: url('{{cover.url}}');")
     if labels
       .minicard-labels
         each labels
-          .minicard-label(class="card-label-{{color}}" title="{{name}}")
+          unless hiddenMinicardLabelText
+            span.card-label(class="card-label-{{color}}" title=name)
+              +viewer
+                = name
+          if hiddenMinicardLabelText
+            .minicard-label(class="card-label-{{color}}" title="{{name}}")
     .minicard-title
       if $eq 'prefix-with-full-path' currentBoard.presentParentTask
         .parent-prefix
@@ -45,6 +58,8 @@ template(name="minicard")
       if getDue
         .date
           +minicardDueDate
+      if getEnd
+         +minicardEndDate
       if getSpentTime
         .date
           +cardSpentTime
@@ -52,12 +67,25 @@ template(name="minicard")
     .minicard-custom-fields
       each customFieldsWD
         if definition.showOnCard
-          .minicard-custom-field
-            .minicard-custom-field-item
-              = definition.name
-            .minicard-custom-field-item
-              +viewer
-                = trueValue
+          if trueValue
+            .minicard-custom-field
+              if definition.showLabelOnMiniCard
+                .minicard-custom-field-item
+                  +viewer
+                    = definition.name
+              .minicard-custom-field-item
+                if $eq definition.type "currency"
+                  +viewer
+                    = formattedCurrencyCustomFieldValue(definition)
+                else
+                  +viewer
+                    = trueValue
+
+    if getAssignees
+      .minicard-assignees.js-minicard-assignees
+        each getAssignees
+          +userAvatar(userId=this)
+        hr
 
     if getMembers
       .minicard-members.js-minicard-members
@@ -69,10 +97,19 @@ template(name="minicard")
         if comments.count
           .badge(title="{{_ 'card-comments-title' comments.count }}")
             span.badge-icon.fa.fa-comment-o.badge-comment
-            span.badge-text= comments.count
+              = ' '
+              = comments.count
+            //span.badge-comment.badge-text
+            //|  {{_ 'comment'}}
       if getDescription
         .badge.badge-state-image-only(title=getDescription)
           span.badge-icon.fa.fa-align-left
+      if getVoteQuestion
+        .badge.badge-state-image-only(title=getVoteQuestion)
+          span.badge-icon.fa.fa-thumbs-up(class="{{#if voteState}}text-green{{/if}}")
+          span.badge-text {{ voteCountPositive }}
+          span.badge-icon.fa.fa-thumbs-down(class="{{#if $eq voteState false}}text-red{{/if}}")
+          span.badge-text {{ voteCountNegative }}
       if attachments.count
         .badge
           span.badge-icon.fa.fa-paperclip

@@ -1,65 +1,178 @@
 Lists = new Mongo.Collection('lists');
 
-Lists.attachSchema(new SimpleSchema({
-  title: {
-    type: String,
-  },
-  archived: {
-    type: Boolean,
-    autoValue() { // eslint-disable-line consistent-return
-      if (this.isInsert && !this.isSet) {
-        return false;
-      }
+/**
+ * A list (column) in the Wekan board.
+ */
+Lists.attachSchema(
+  new SimpleSchema({
+    title: {
+      /**
+       * the title of the list
+       */
+      type: String,
     },
-  },
-  boardId: {
-    type: String,
-  },
-  createdAt: {
-    type: Date,
-    autoValue() { // eslint-disable-line consistent-return
-      if (this.isInsert) {
-        return new Date();
-      } else {
-        this.unset();
-      }
+    starred: {
+      /**
+       * if a list is stared
+       * then we put it on the top
+       */
+      type: Boolean,
+      optional: true,
+      defaultValue: false,
     },
-  },
-  sort: {
-    type: Number,
-    decimal: true,
-    // XXX We should probably provide a default
-    optional: true,
-  },
-  updatedAt: {
-    type: Date,
-    optional: true,
-    autoValue() { // eslint-disable-line consistent-return
-      if (this.isUpdate) {
-        return new Date();
-      } else {
-        this.unset();
-      }
+    archived: {
+      /**
+       * is the list archived
+       */
+      type: Boolean,
+      // eslint-disable-next-line consistent-return
+      autoValue() {
+        if (this.isInsert && !this.isSet) {
+          return false;
+        }
+      },
     },
-  },
-  wipLimit: {
-    type: Object,
-    optional: true,
-  },
-  'wipLimit.value': {
-    type: Number,
-    decimal: false,
-    defaultValue: 1,
-  },
-  'wipLimit.enabled': {
-    type: Boolean,
-    defaultValue: false,
-  },
-  'wipLimit.soft': {
-    type: Boolean,
-    defaultValue: false,
-  },
-}));
+    boardId: {
+      /**
+       * the board associated to this list
+       */
+      type: String,
+    },
+    swimlaneId: {
+      /**
+       * the swimlane associated to this list. Used for templates
+       */
+      type: String,
+      defaultValue: '',
+    },
+    createdAt: {
+      /**
+       * creation date
+       */
+      type: Date,
+      // eslint-disable-next-line consistent-return
+      autoValue() {
+        if (this.isInsert) {
+          return new Date();
+        } else if (this.isUpsert) {
+          return { $setOnInsert: new Date() };
+        } else {
+          this.unset();
+        }
+      },
+    },
+    sort: {
+      /**
+       * is the list sorted
+       */
+      type: Number,
+      decimal: true,
+      // XXX We should probably provide a default
+      optional: true,
+    },
+    updatedAt: {
+      /**
+       * last update of the list
+       */
+      type: Date,
+      optional: true,
+      // eslint-disable-next-line consistent-return
+      autoValue() {
+        if (this.isUpdate || this.isUpsert || this.isInsert) {
+          return new Date();
+        } else {
+          this.unset();
+        }
+      },
+    },
+    modifiedAt: {
+      type: Date,
+      denyUpdate: false,
+      // eslint-disable-next-line consistent-return
+      autoValue() {
+        // this is redundant with updatedAt
+        /*if (this.isInsert || this.isUpsert || this.isUpdate) {
+          return new Date();
+        } else {
+          this.unset();
+        }*/
+        if (!this.isSet) {
+          return new Date();
+        }
+      },
+    },
+    wipLimit: {
+      /**
+       * WIP object, see below
+       */
+      type: Object,
+      optional: true,
+    },
+    'wipLimit.value': {
+      /**
+       * value of the WIP
+       */
+      type: Number,
+      decimal: false,
+      defaultValue: 1,
+    },
+    'wipLimit.enabled': {
+      /**
+       * is the WIP enabled
+       */
+      type: Boolean,
+      defaultValue: false,
+    },
+    'wipLimit.soft': {
+      /**
+       * is the WIP a soft or hard requirement
+       */
+      type: Boolean,
+      defaultValue: false,
+    },
+    color: {
+      /**
+       * the color of the list
+       */
+      type: String,
+      optional: true,
+      // silver is the default, so it is left out
+      allowedValues: [
+        'white',
+        'green',
+        'yellow',
+        'orange',
+        'red',
+        'purple',
+        'blue',
+        'sky',
+        'lime',
+        'pink',
+        'black',
+        'peachpuff',
+        'crimson',
+        'plum',
+        'darkgreen',
+        'slateblue',
+        'magenta',
+        'gold',
+        'navy',
+        'gray',
+        'saddlebrown',
+        'paleturquoise',
+        'mistyrose',
+        'indigo',
+      ],
+    },
+    type: {
+      /**
+       * The type of list
+       */
+      type: String,
+      defaultValue: 'list',
+    },
+  }),
+);
 
 Lists.allow({
   insert(userId, doc) {
@@ -75,15 +188,52 @@ Lists.allow({
 });
 
 Lists.helpers({
+  copy(boardId, swimlaneId) {
+    const oldId = this._id;
+    const oldSwimlaneId = this.swimlaneId || null;
+    this.boardId = boardId;
+    this.swimlaneId = swimlaneId;
+
+    let _id = null;
+    existingListWithSameName = Lists.findOne({
+      boardId,
+      title: this.title,
+      archived: false,
+    });
+    if (existingListWithSameName) {
+      _id = existingListWithSameName._id;
+    } else {
+      delete this._id;
+      delete this.swimlaneId;
+      _id = Lists.insert(this);
+    }
+
+    // Copy all cards in list
+    Cards.find({
+      swimlaneId: oldSwimlaneId,
+      listId: oldId,
+      archived: false,
+    }).forEach(card => {
+      card.copy(boardId, swimlaneId, _id);
+    });
+  },
+
   cards(swimlaneId) {
     const selector = {
       listId: this._id,
       archived: false,
     };
-    if (swimlaneId)
-      selector.swimlaneId = swimlaneId;
-    return Cards.find(Filter.mongoSelector(selector),
-      { sort: ['sort'] });
+    if (swimlaneId) selector.swimlaneId = swimlaneId;
+    return Cards.find(Filter.mongoSelector(selector), { sort: ['sort'] });
+  },
+
+  cardsUnfiltered(swimlaneId) {
+    const selector = {
+      listId: this._id,
+      archived: false,
+    };
+    if (swimlaneId) selector.swimlaneId = swimlaneId;
+    return Cards.find(selector, { sort: ['sort'] });
   },
 
   allCards() {
@@ -94,15 +244,37 @@ Lists.helpers({
     return Boards.findOne(this.boardId);
   },
 
-  getWipLimit(option){
+  getWipLimit(option) {
     const list = Lists.findOne({ _id: this._id });
-    if(!list.wipLimit) { // Necessary check to avoid exceptions for the case where the doc doesn't have the wipLimit field yet set
+    if (!list.wipLimit) {
+      // Necessary check to avoid exceptions for the case where the doc doesn't have the wipLimit field yet set
       return 0;
-    } else if(!option) {
+    } else if (!option) {
       return list.wipLimit;
     } else {
       return list.wipLimit[option] ? list.wipLimit[option] : 0; // Necessary check to avoid exceptions for the case where the doc doesn't have the wipLimit field yet set
     }
+  },
+
+  colorClass() {
+    if (this.color) return this.color;
+    return '';
+  },
+
+  isTemplateList() {
+    return this.type === 'template-list';
+  },
+
+  isStarred() {
+    return this.starred === true;
+  },
+
+  absoluteUrl() {
+    const card = Cards.findOne({ listId: this._id });
+    return card && card.absoluteUrl();
+  },
+  remove() {
+    Lists.remove({ _id: this._id });
   },
 });
 
@@ -110,12 +282,25 @@ Lists.mutations({
   rename(title) {
     return { $set: { title } };
   },
+  star(enable = true) {
+    return { $set: { starred: !!enable } };
+  },
 
   archive() {
+    if (this.isTemplateList()) {
+      this.cards().forEach(card => {
+        return card.archive();
+      });
+    }
     return { $set: { archived: true } };
   },
 
   restore() {
+    if (this.isTemplateList()) {
+      this.allCards().forEach(card => {
+        return card.restore();
+      });
+    }
     return { $set: { archived: false } };
   },
 
@@ -130,13 +315,24 @@ Lists.mutations({
   setWipLimit(limit) {
     return { $set: { 'wipLimit.value': limit } };
   },
+
+  setColor(newColor) {
+    if (newColor === 'silver') {
+      newColor = null;
+    }
+    return {
+      $set: {
+        color: newColor,
+      },
+    };
+  },
 });
 
 Meteor.methods({
-  applyWipLimit(listId, limit){
+  applyWipLimit(listId, limit) {
     check(listId, String);
     check(limit, Number);
-    if(limit === 0){
+    if (limit === 0) {
       limit = 1;
     }
     Lists.findOne({ _id: listId }).setWipLimit(limit);
@@ -145,7 +341,7 @@ Meteor.methods({
   enableWipLimit(listId) {
     check(listId, String);
     const list = Lists.findOne({ _id: listId });
-    if(list.getWipLimit('value') === 0){
+    if (list.getWipLimit('value') === 0) {
       list.setWipLimit(1);
     }
     list.toggleWipLimit(!list.getWipLimit('enabled'));
@@ -162,6 +358,7 @@ Lists.hookOptions.after.update = { fetchPrevious: false };
 
 if (Meteor.isServer) {
   Meteor.startup(() => {
+    Lists._collection._ensureIndex({ modifiedAt: -1 });
     Lists._collection._ensureIndex({ boardId: 1 });
   });
 
@@ -172,10 +369,19 @@ if (Meteor.isServer) {
       activityType: 'createList',
       boardId: doc.boardId,
       listId: doc._id,
+      // this preserves the name so that the activity can be useful after the
+      // list is deleted
+      title: doc.title,
     });
   });
 
   Lists.before.remove((userId, doc) => {
+    const cards = Cards.find({ listId: doc._id });
+    if (cards) {
+      cards.forEach(card => {
+        Cards.remove(card._id);
+      });
+    }
     Activities.insert({
       userId,
       type: 'list',
@@ -194,6 +400,9 @@ if (Meteor.isServer) {
         activityType: 'archivedList',
         listId: doc._id,
         boardId: doc.boardId,
+        // this preserves the name so that the activity can be useful after the
+        // list is deleted
+        title: doc.title,
       });
     }
   });
@@ -201,22 +410,31 @@ if (Meteor.isServer) {
 
 //LISTS REST API
 if (Meteor.isServer) {
-  JsonRoutes.add('GET', '/api/boards/:boardId/lists', function (req, res) {
+  /**
+   * @operation get_all_lists
+   * @summary Get the list of Lists attached to a board
+   *
+   * @param {string} boardId the board ID
+   * @return_type [{_id: string,
+   *           title: string}]
+   */
+  JsonRoutes.add('GET', '/api/boards/:boardId/lists', function(req, res) {
     try {
       const paramBoardId = req.params.boardId;
-      Authentication.checkBoardAccess( req.userId, paramBoardId);
+      Authentication.checkBoardAccess(req.userId, paramBoardId);
 
       JsonRoutes.sendResult(res, {
         code: 200,
-        data: Lists.find({ boardId: paramBoardId, archived: false }).map(function (doc) {
-          return {
-            _id: doc._id,
-            title: doc.title,
-          };
-        }),
+        data: Lists.find({ boardId: paramBoardId, archived: false }).map(
+          function(doc) {
+            return {
+              _id: doc._id,
+              title: doc.title,
+            };
+          },
+        ),
       });
-    }
-    catch (error) {
+    } catch (error) {
       JsonRoutes.sendResult(res, {
         code: 200,
         data: error,
@@ -224,17 +442,31 @@ if (Meteor.isServer) {
     }
   });
 
-  JsonRoutes.add('GET', '/api/boards/:boardId/lists/:listId', function (req, res) {
+  /**
+   * @operation get_list
+   * @summary Get a List attached to a board
+   *
+   * @param {string} boardId the board ID
+   * @param {string} listId the List ID
+   * @return_type Lists
+   */
+  JsonRoutes.add('GET', '/api/boards/:boardId/lists/:listId', function(
+    req,
+    res,
+  ) {
     try {
       const paramBoardId = req.params.boardId;
       const paramListId = req.params.listId;
-      Authentication.checkBoardAccess( req.userId, paramBoardId);
+      Authentication.checkBoardAccess(req.userId, paramBoardId);
       JsonRoutes.sendResult(res, {
         code: 200,
-        data: Lists.findOne({ _id: paramListId, boardId: paramBoardId, archived: false }),
+        data: Lists.findOne({
+          _id: paramListId,
+          boardId: paramBoardId,
+          archived: false,
+        }),
       });
-    }
-    catch (error) {
+    } catch (error) {
       JsonRoutes.sendResult(res, {
         code: 200,
         data: error,
@@ -242,13 +474,23 @@ if (Meteor.isServer) {
     }
   });
 
-  JsonRoutes.add('POST', '/api/boards/:boardId/lists', function (req, res) {
+  /**
+   * @operation new_list
+   * @summary Add a List to a board
+   *
+   * @param {string} boardId the board ID
+   * @param {string} title the title of the List
+   * @return_type {_id: string}
+   */
+  JsonRoutes.add('POST', '/api/boards/:boardId/lists', function(req, res) {
     try {
-      Authentication.checkUserId( req.userId);
+      Authentication.checkUserId(req.userId);
       const paramBoardId = req.params.boardId;
+      const board = Boards.findOne(paramBoardId);
       const id = Lists.insert({
         title: req.body.title,
         boardId: paramBoardId,
+        sort: board.lists().count(),
       });
       JsonRoutes.sendResult(res, {
         code: 200,
@@ -256,8 +498,7 @@ if (Meteor.isServer) {
           _id: id,
         },
       });
-    }
-    catch (error) {
+    } catch (error) {
       JsonRoutes.sendResult(res, {
         code: 200,
         data: error,
@@ -265,9 +506,23 @@ if (Meteor.isServer) {
     }
   });
 
-  JsonRoutes.add('DELETE', '/api/boards/:boardId/lists/:listId', function (req, res) {
+  /**
+   * @operation delete_list
+   * @summary Delete a List
+   *
+   * @description This **deletes** a list from a board.
+   * The list is not put in the recycle bin.
+   *
+   * @param {string} boardId the board ID
+   * @param {string} listId the ID of the list to remove
+   * @return_type {_id: string}
+   */
+  JsonRoutes.add('DELETE', '/api/boards/:boardId/lists/:listId', function(
+    req,
+    res,
+  ) {
     try {
-      Authentication.checkUserId( req.userId);
+      Authentication.checkUserId(req.userId);
       const paramBoardId = req.params.boardId;
       const paramListId = req.params.listId;
       Lists.remove({ _id: paramListId, boardId: paramBoardId });
@@ -277,13 +532,13 @@ if (Meteor.isServer) {
           _id: paramListId,
         },
       });
-    }
-    catch (error) {
+    } catch (error) {
       JsonRoutes.sendResult(res, {
         code: 200,
         data: error,
       });
     }
   });
-
 }
+
+export default Lists;

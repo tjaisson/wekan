@@ -1,9 +1,14 @@
 Meteor.subscribe('user-admin');
 Meteor.subscribe('boards');
+Meteor.subscribe('setting');
 
 Template.header.helpers({
   wrappedHeader() {
     return !Session.get('currentBoard');
+  },
+
+  currentSetting() {
+    return Settings.findOne();
   },
 
   hideLogo() {
@@ -15,13 +20,13 @@ Template.header.helpers({
   },
 
   hasAnnouncement() {
-    const announcements =  Announcements.findOne();
+    const announcements = Announcements.findOne();
     return announcements && announcements.enabled;
   },
 
   announcement() {
     $('.announcement').show();
-    const announcements =  Announcements.findOne();
+    const announcements = Announcements.findOne();
     return announcements && announcements.body;
   },
 });

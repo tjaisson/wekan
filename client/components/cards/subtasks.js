@@ -1,11 +1,15 @@
 BlazeComponent.extendComponent({
   canModifyCard() {
-    return Meteor.user() && Meteor.user().isBoardMember() && !Meteor.user().isCommentOnly();
+    return (
+      Meteor.user() &&
+      Meteor.user().isBoardMember() &&
+      !Meteor.user().isCommentOnly() &&
+      !Meteor.user().isWorker()
+    );
   },
 }).register('subtaskDetail');
 
 BlazeComponent.extendComponent({
-
   addSubtask(event) {
     event.preventDefault();
     const textarea = this.find('textarea.js-add-subtask-item');
@@ -16,7 +20,22 @@ BlazeComponent.extendComponent({
     const crtBoard = Boards.findOne(card.boardId);
     const targetBoard = crtBoard.getDefaultSubtasksBoard();
     const listId = targetBoard.getDefaultSubtasksListId();
-    const swimlaneId = targetBoard.getDefaultSwimline()._id;
+
+    //Get the full swimlane data for the parent task.
+    const parentSwimlane = Swimlanes.findOne({
+      boardId: crtBoard._id,
+      _id: card.swimlaneId,
+    });
+    //find the swimlane of the same name in the target board.
+    const targetSwimlane = Swimlanes.findOne({
+      boardId: targetBoard._id,
+      title: parentSwimlane.title,
+    });
+    //If no swimlane with a matching title exists in the target board, fall back to the default swimlane.
+    const swimlaneId =
+      targetSwimlane === undefined
+        ? targetBoard.getDefaultSwimline()._id
+        : targetSwimlane._id;
 
     if (title) {
       const _id = Cards.insert({
@@ -38,9 +57,10 @@ BlazeComponent.extendComponent({
       // See https://github.com/wekan/wekan/issues/80
       Filter.addException(_id);
 
-
       setTimeout(() => {
-        this.$('.add-subtask-item').last().click();
+        this.$('.add-subtask-item')
+          .last()
+          .click();
       }, 100);
     }
     textarea.value = '';
@@ -48,7 +68,12 @@ BlazeComponent.extendComponent({
   },
 
   canModifyCard() {
-    return Meteor.user() && Meteor.user().isBoardMember() && !Meteor.user().isCommentOnly();
+    return (
+      Meteor.user() &&
+      Meteor.user().isBoardMember() &&
+      !Meteor.user().isCommentOnly() &&
+      !Meteor.user().isWorker()
+    );
   },
 
   deleteSubtask() {
@@ -85,13 +110,13 @@ BlazeComponent.extendComponent({
   events() {
     const events = {
       'click .toggle-delete-subtask-dialog'(event) {
-        if($(event.target).hasClass('js-delete-subtask')){
+        if ($(event.target).hasClass('js-delete-subtask')) {
           this.subtaskToDelete = this.currentData().subtask; //Store data context
         }
         this.toggleDeleteDialog.set(!this.toggleDeleteDialog.get());
       },
       'click .js-view-subtask'(event) {
-        if($(event.target).hasClass('js-view-subtask')){
+        if ($(event.target).hasClass('js-view-subtask')) {
           const subtask = this.currentData().subtask;
           const board = subtask.board();
           FlowRouter.go('card', {
@@ -103,27 +128,33 @@ BlazeComponent.extendComponent({
       },
     };
 
-    return [{
-      ...events,
-      'submit .js-add-subtask': this.addSubtask,
-      'submit .js-edit-subtask-title': this.editSubtask,
-      'click .confirm-subtask-delete': this.deleteSubtask,
-      keydown: this.pressKey,
-    }];
+    return [
+      {
+        ...events,
+        'submit .js-add-subtask': this.addSubtask,
+        'submit .js-edit-subtask-title': this.editSubtask,
+        'click .confirm-subtask-delete': this.deleteSubtask,
+        keydown: this.pressKey,
+      },
+    ];
   },
 }).register('subtasks');
 
 Template.subtaskDeleteDialog.onCreated(() => {
   const $cardDetails = this.$('.card-details');
-  this.scrollState = { position: $cardDetails.scrollTop(), //save current scroll position
+  this.scrollState = {
+    position: $cardDetails.scrollTop(), //save current scroll position
     top: false, //required for smooth scroll animation
   };
   //Callback's purpose is to only prevent scrolling after animation is complete
-  $cardDetails.animate({ scrollTop: 0 }, 500, () => { this.scrollState.top = true; });
+  $cardDetails.animate({ scrollTop: 0 }, 500, () => {
+    this.scrollState.top = true;
+  });
 
   //Prevent scrolling while dialog is open
   $cardDetails.on('scroll', () => {
-    if(this.scrollState.top) { //If it's already in position, keep it there. Otherwise let animation scroll
+    if (this.scrollState.top) {
+      //If it's already in position, keep it there. Otherwise let animation scroll
       $cardDetails.scrollTop(0);
     }
   });
@@ -132,12 +163,17 @@ Template.subtaskDeleteDialog.onCreated(() => {
 Template.subtaskDeleteDialog.onDestroyed(() => {
   const $cardDetails = this.$('.card-details');
   $cardDetails.off('scroll'); //Reactivate scrolling
-  $cardDetails.animate( { scrollTop: this.scrollState.position });
+  $cardDetails.animate({ scrollTop: this.scrollState.position });
 });
 
 Template.subtaskItemDetail.helpers({
   canModifyCard() {
-    return Meteor.user() && Meteor.user().isBoardMember() && !Meteor.user().isCommentOnly();
+    return (
+      Meteor.user() &&
+      Meteor.user().isBoardMember() &&
+      !Meteor.user().isCommentOnly() &&
+      !Meteor.user().isWorker()
+    );
   },
 });
 

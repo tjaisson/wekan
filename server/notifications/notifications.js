@@ -14,35 +14,25 @@ Notifications = {
     notifyServices[serviceName] = callback;
   },
 
-  unsubscribe: (serviceName) => {
+  unsubscribe: serviceName => {
     if (typeof notifyServices[serviceName] === 'function')
       delete notifyServices[serviceName];
   },
 
-  // filter recipients according to user settings for notification
-  getUsers: (participants, watchers) => {
-    const userMap = {};
-    participants.forEach((userId) => {
-      if (userMap[userId]) return;
+  getUsers: watchers => {
+    const users = [];
+    watchers.forEach(userId => {
       const user = Users.findOne(userId);
-      if (user && user.hasTag('notify-participate')) {
-        userMap[userId] = user;
-      }
+      if (user) users.push(user);
     });
-    watchers.forEach((userId) => {
-      if (userMap[userId]) return;
-      const user = Users.findOne(userId);
-      if (user && user.hasTag('notify-watch')) {
-        userMap[userId] = user;
-      }
-    });
-    return _.map(userMap, (v) => v);
+    return users;
   },
 
   notify: (user, title, description, params) => {
-    for(const k in notifyServices) {
+    for (const k in notifyServices) {
       const notifyImpl = notifyServices[k];
-      if (notifyImpl && typeof notifyImpl === 'function') notifyImpl(user, title, description, params);
+      if (notifyImpl && typeof notifyImpl === 'function')
+        notifyImpl(user, title, description, params);
     }
   },
 };

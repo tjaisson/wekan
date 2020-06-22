@@ -6,11 +6,14 @@ BlazeComponent.extendComponent({
     this.emailSetting = new ReactiveVar(false);
     this.accountSetting = new ReactiveVar(false);
     this.announcementSetting = new ReactiveVar(false);
+    this.layoutSetting = new ReactiveVar(false);
+    this.webhookSetting = new ReactiveVar(false);
 
     Meteor.subscribe('setting');
     Meteor.subscribe('mailServer');
     Meteor.subscribe('accountSettings');
     Meteor.subscribe('announcements');
+    Meteor.subscribe('globalwebhooks');
   },
 
   setError(error) {
@@ -24,7 +27,9 @@ BlazeComponent.extendComponent({
   checkField(selector) {
     const value = $(selector).val();
     if (!value || value.trim() === '') {
-      $(selector).parents('li.smtp-form').addClass('has-error');
+      $(selector)
+        .parents('li.smtp-form')
+        .addClass('has-error');
       throw Error('blank field');
     } else {
       return value;
@@ -36,18 +41,23 @@ BlazeComponent.extendComponent({
   },
 
   boards() {
-    return Boards.find({
-      archived: false,
-      'members.userId': Meteor.userId(),
-      'members.isAdmin': true,
-    }, {
-      sort: ['title'],
-    });
+    return Boards.find(
+      {
+        archived: false,
+        'members.userId': Meteor.userId(),
+        'members.isAdmin': true,
+      },
+      {
+        sort: { sort: 1 /* boards default sorting */ },
+      },
+    );
   },
   toggleRegistration() {
     this.setLoading(true);
     const registrationClosed = this.currentSetting().disableRegistration;
-    Settings.update(Settings.findOne()._id, {$set: {disableRegistration: !registrationClosed}});
+    Settings.update(Settings.findOne()._id, {
+      $set: { disableRegistration: !registrationClosed },
+    });
     this.setLoading(false);
     if (registrationClosed) {
       $('.invite-people').slideUp();
@@ -57,6 +67,12 @@ BlazeComponent.extendComponent({
   },
   toggleTLS() {
     $('#mail-server-tls').toggleClass('is-checked');
+  },
+  toggleHideLogo() {
+    $('#hide-logo').toggleClass('is-checked');
+  },
+  toggleDisplayAuthenticationMethod() {
+    $('#display-authentication-method').toggleClass('is-checked');
   },
   switchMenu(event) {
     const target = $(event.target);
@@ -68,6 +84,8 @@ BlazeComponent.extendComponent({
       this.emailSetting.set('email-setting' === targetID);
       this.accountSetting.set('account-setting' === targetID);
       this.announcementSetting.set('announcement-setting' === targetID);
+      this.layoutSetting.set('layout-setting' === targetID);
+      this.webhookSetting.set('webhook-setting' === targetID);
     }
   },
 
@@ -82,13 +100,19 @@ BlazeComponent.extendComponent({
   },
 
   inviteThroughEmail() {
-    const emails = $('#email-to-invite').val().trim().split('\n').join(',').split(',');
+    const emails = $('#email-to-invite')
+      .val()
+      .toLowerCase()
+      .trim()
+      .split('\n')
+      .join(',')
+      .split(',');
     const boardsToInvite = [];
-    $('.js-toggle-board-choose .materialCheckBox.is-checked').each(function () {
+    $('.js-toggle-board-choose .materialCheckBox.is-checked').each(function() {
       boardsToInvite.push($(this).data('id'));
     });
     const validEmails = [];
-    emails.forEach((email) => {
+    emails.forEach(email => {
       if (email && SimpleSchema.RegEx.Email.test(email.trim())) {
         validEmails.push(email.trim());
       }
@@ -111,14 +135,50 @@ BlazeComponent.extendComponent({
     try {
       const host = this.checkField('#mail-server-host');
       const port = this.checkField('#mail-server-port');
-      const username = $('#mail-server-username').val().trim();
-      const password = $('#mail-server-password').val().trim();
+      const username = $('#mail-server-username')
+        .val()
+        .trim();
+      const password = $('#mail-server-password')
+        .val()
+        .trim();
       const from = this.checkField('#mail-server-from');
       const tls = $('#mail-server-tls.is-checked').length > 0;
       Settings.update(Settings.findOne()._id, {
         $set: {
-          'mailServer.host': host, 'mailServer.port': port, 'mailServer.username': username,
-          'mailServer.password': password, 'mailServer.enableTLS': tls, 'mailServer.from': from,
+          'mailServer.host': host,
+          'mailServer.port': port,
+          'mailServer.username': username,
+          'mailServer.password': password,
+          'mailServer.enableTLS': tls,
+          'mailServer.from': from,
+        },
+      });
+    } catch (e) {
+      return;
+    } finally {
+      this.setLoading(false);
+    }
+  },
+
+  saveLayout() {
+    this.setLoading(true);
+    $('li').removeClass('has-error');
+
+    const productName = $('#product-name')
+      .val()
+      .trim();
+    const hideLogoChange = $('input[name=hideLogo]:checked').val() === 'true';
+    const displayAuthenticationMethod =
+      $('input[name=displayAuthenticationMethod]:checked').val() === 'true';
+    const defaultAuthenticationMethod = $('#defaultAuthenticationMethod').val();
+
+    try {
+      Settings.update(Settings.findOne()._id, {
+        $set: {
+          productName,
+          hideLogo: hideLogoChange,
+          displayAuthenticationMethod,
+          defaultAuthenticationMethod,
         },
       });
     } catch (e) {
@@ -127,47 +187,57 @@ BlazeComponent.extendComponent({
       this.setLoading(false);
     }
 
+    DocHead.setTitle(productName);
   },
 
   sendSMTPTestEmail() {
     Meteor.call('sendSMTPTestEmail', (err, ret) => {
-      if (!err && ret) { /* eslint-disable no-console */
+      if (!err && ret) {
         const message = `${TAPi18n.__(ret.message)}: ${ret.email}`;
-        console.log(message);
         alert(message);
       } else {
         const reason = err.reason || '';
         const message = `${TAPi18n.__(err.error)}\n${reason}`;
-        console.log(message, err);
         alert(message);
       }
-      /* eslint-enable no-console */
     });
   },
 
   events() {
-    return [{
-      'click a.js-toggle-registration': this.toggleRegistration,
-      'click a.js-toggle-tls': this.toggleTLS,
-      'click a.js-setting-menu': this.switchMenu,
-      'click a.js-toggle-board-choose': this.checkBoard,
-      'click button.js-email-invite': this.inviteThroughEmail,
-      'click button.js-save': this.saveMailServerInfo,
-      'click button.js-send-smtp-test-email': this.sendSMTPTestEmail,
-    }];
+    return [
+      {
+        'click a.js-toggle-registration': this.toggleRegistration,
+        'click a.js-toggle-tls': this.toggleTLS,
+        'click a.js-setting-menu': this.switchMenu,
+        'click a.js-toggle-board-choose': this.checkBoard,
+        'click button.js-email-invite': this.inviteThroughEmail,
+        'click button.js-save': this.saveMailServerInfo,
+        'click button.js-send-smtp-test-email': this.sendSMTPTestEmail,
+        'click a.js-toggle-hide-logo': this.toggleHideLogo,
+        'click button.js-save-layout': this.saveLayout,
+        'click a.js-toggle-display-authentication-method': this
+          .toggleDisplayAuthenticationMethod,
+      },
+    ];
   },
 }).register('setting');
 
 BlazeComponent.extendComponent({
-
   saveAccountsChange() {
-    const allowEmailChange = ($('input[name=allowEmailChange]:checked').val() === 'true');
-    const allowUserNameChange = ($('input[name=allowUserNameChange]:checked').val() === 'true');
+    const allowEmailChange =
+      $('input[name=allowEmailChange]:checked').val() === 'true';
+    const allowUserNameChange =
+      $('input[name=allowUserNameChange]:checked').val() === 'true';
+    const allowUserDelete =
+      $('input[name=allowUserDelete]:checked').val() === 'true';
     AccountSettings.update('accounts-allowEmailChange', {
-      $set: {'booleanValue': allowEmailChange},
+      $set: { booleanValue: allowEmailChange },
     });
     AccountSettings.update('accounts-allowUserNameChange', {
-      $set: {'booleanValue': allowUserNameChange},
+      $set: { booleanValue: allowUserNameChange },
+    });
+    AccountSettings.update('accounts-allowUserDelete', {
+      $set: { booleanValue: allowUserDelete },
     });
   },
 
@@ -177,11 +247,16 @@ BlazeComponent.extendComponent({
   allowUserNameChange() {
     return AccountSettings.findOne('accounts-allowUserNameChange').booleanValue;
   },
+  allowUserDelete() {
+    return AccountSettings.findOne('accounts-allowUserDelete').booleanValue;
+  },
 
   events() {
-    return [{
-      'click button.js-accounts-save': this.saveAccountsChange,
-    }];
+    return [
+      {
+        'click button.js-accounts-save': this.saveAccountsChange,
+      },
+    ];
   },
 }).register('accountSettings');
 
@@ -199,9 +274,11 @@ BlazeComponent.extendComponent({
   },
 
   saveMessage() {
-    const message = $('#admin-announcement').val().trim();
+    const message = $('#admin-announcement')
+      .val()
+      .trim();
     Announcements.update(Announcements.findOne()._id, {
-      $set: {'body': message},
+      $set: { body: message },
     });
   },
 
@@ -209,7 +286,7 @@ BlazeComponent.extendComponent({
     this.setLoading(true);
     const isActive = this.currentSetting().enabled;
     Announcements.update(Announcements.findOne()._id, {
-      $set: {'enabled': !isActive},
+      $set: { enabled: !isActive },
     });
     this.setLoading(false);
     if (isActive) {
@@ -220,9 +297,38 @@ BlazeComponent.extendComponent({
   },
 
   events() {
-    return [{
-      'click a.js-toggle-activemessage': this.toggleActive,
-      'click button.js-announcement-save': this.saveMessage,
-    }];
+    return [
+      {
+        'click a.js-toggle-activemessage': this.toggleActive,
+        'click button.js-announcement-save': this.saveMessage,
+      },
+    ];
   },
 }).register('announcementSettings');
+
+Template.selectAuthenticationMethod.onCreated(function() {
+  this.authenticationMethods = new ReactiveVar([]);
+
+  Meteor.call('getAuthenticationsEnabled', (_, result) => {
+    if (result) {
+      // TODO : add a management of different languages
+      // (ex {value: ldap, text: TAPi18n.__('ldap', {}, T9n.getLanguage() || 'en')})
+      this.authenticationMethods.set([
+        { value: 'password' },
+        // Gets only the authentication methods availables
+        ...Object.entries(result)
+          .filter(e => e[1])
+          .map(e => ({ value: e[0] })),
+      ]);
+    }
+  });
+});
+
+Template.selectAuthenticationMethod.helpers({
+  authentications() {
+    return Template.instance().authenticationMethods.get();
+  },
+  isSelected(match) {
+    return Template.instance().data.authenticationMethod === match;
+  },
+});

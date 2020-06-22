@@ -1,6 +1,16 @@
 // XXX There is no reason to define these shortcuts globally, they should be
 // attached to a template (most of them will go in the `board` template).
 
+function getHoveredCardId() {
+  const card = $('.js-minicard:hover').get(0);
+  if (!card) return null;
+  return Blaze.getData(card)._id;
+}
+
+function getSelectedCardId() {
+  return Session.get('selectedCard') || getHoveredCardId();
+}
+
 Mousetrap.bind('?', () => {
   FlowRouter.go('shortcuts');
 });
@@ -40,17 +50,19 @@ Mousetrap.bind(['down', 'up'], (evt, key) => {
     return;
   }
 
-  const nextFunc = (key === 'down' ? 'next' : 'prev');
-  const nextCard = $('.js-minicard.is-selected')[nextFunc]('.js-minicard').get(0);
+  const nextFunc = key === 'down' ? 'next' : 'prev';
+  const nextCard = $('.js-minicard.is-selected')
+    [nextFunc]('.js-minicard')
+    .get(0);
   if (nextCard) {
     const nextCardId = Blaze.getData(nextCard)._id;
     Utils.goCardId(nextCardId);
   }
 });
 
-// XXX This shortcut should also work when hovering over a card in board view
-Mousetrap.bind('space', (evt) => {
-  if (!Session.get('currentCard')) {
+Mousetrap.bind('space', evt => {
+  const cardId = getSelectedCardId();
+  if (!cardId) {
     return;
   }
 
@@ -60,7 +72,7 @@ Mousetrap.bind('space', (evt) => {
   }
 
   if (Meteor.user().isBoardMember()) {
-    const card = Cards.findOne(Session.get('currentCard'));
+    const card = Cards.findOne(cardId);
     card.toggleMember(currentUserId);
     // We should prevent scrolling in card when spacebar is clicked
     // This should do it according to Mousetrap docs, but it doesn't
@@ -68,30 +80,67 @@ Mousetrap.bind('space', (evt) => {
   }
 });
 
+Mousetrap.bind('c', evt => {
+  const cardId = getSelectedCardId();
+  if (!cardId) {
+    return;
+  }
+
+  const currentUserId = Meteor.userId();
+  if (currentUserId === null) {
+    return;
+  }
+
+  if (
+    Meteor.user().isBoardMember() &&
+    !Meteor.user().isCommentOnly() &&
+    !Meteor.user().isWorker()
+  ) {
+    const card = Cards.findOne(cardId);
+    card.archive();
+    // We should prevent scrolling in card when spacebar is clicked
+    // This should do it according to Mousetrap docs, but it doesn't
+    evt.preventDefault();
+  }
+});
+
 Template.keyboardShortcuts.helpers({
-  mapping: [{
-    keys: ['W'],
-    action: 'shortcut-toggle-sidebar',
-  }, {
-    keys: ['Q'],
-    action: 'shortcut-filter-my-cards',
-  }, {
-    keys: ['F'],
-    action: 'shortcut-toggle-filterbar',
-  }, {
-    keys: ['X'],
-    action: 'shortcut-clear-filters',
-  }, {
-    keys: ['?'],
-    action: 'shortcut-show-shortcuts',
-  }, {
-    keys: ['ESC'],
-    action: 'shortcut-close-dialog',
-  }, {
-    keys: ['@'],
-    action: 'shortcut-autocomplete-members',
-  }, {
-    keys: ['SPACE'],
-    action: 'shortcut-assign-self',
-  }],
+  mapping: [
+    {
+      keys: ['w'],
+      action: 'shortcut-toggle-sidebar',
+    },
+    {
+      keys: ['q'],
+      action: 'shortcut-filter-my-cards',
+    },
+    {
+      keys: ['f'],
+      action: 'shortcut-toggle-filterbar',
+    },
+    {
+      keys: ['x'],
+      action: 'shortcut-clear-filters',
+    },
+    {
+      keys: ['?'],
+      action: 'shortcut-show-shortcuts',
+    },
+    {
+      keys: ['ESC'],
+      action: 'shortcut-close-dialog',
+    },
+    {
+      keys: ['@'],
+      action: 'shortcut-autocomplete-members',
+    },
+    {
+      keys: ['SPACE'],
+      action: 'shortcut-assign-self',
+    },
+    {
+      keys: ['c'],
+      action: 'archive-card',
+    },
+  ],
 });

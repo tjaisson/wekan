@@ -8,12 +8,19 @@ BlazeComponent.extendComponent({
     return currentBoard.searchCards(this.term.get());
   },
 
+  lists() {
+    const currentBoard = Boards.findOne(Session.get('currentBoard'));
+    return currentBoard.searchLists(this.term.get());
+  },
+
   events() {
-    return [{
-      'submit .js-search-term-form'(evt) {
-        evt.preventDefault();
-        this.term.set(evt.target.searchTerm.value);
+    return [
+      {
+        'submit .js-search-term-form'(evt) {
+          evt.preventDefault();
+          this.term.set(evt.target.searchTerm.value);
+        },
       },
-    }];
+    ];
   },
 }).register('searchSidebar');

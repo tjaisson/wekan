@@ -11,6 +11,19 @@ $spaceBetweenTiles = 16px
     box-sizing: border-box
     position: relative
 
+    &.placeholder:after
+      content: '';
+      display: block;
+      background: darken(white, 20%)
+      border-radius: 3px;
+      height: 106px;
+      margin: 8px;
+
+    &.ui-sortable-helper
+      cursor: grabbing
+      transform: rotate(4deg)
+      display: block !important
+
     &.starred
       .fa-star,
       .fa-star-o
@@ -20,7 +33,7 @@ $spaceBetweenTiles = 16px
     overflow: hidden;
     background-color: #999
     color: #f6f6f6
-    height: 90px
+    height: auto
     font-size: 16px
     line-height: 22px
     border-radius: 3px
@@ -31,6 +44,7 @@ $spaceBetweenTiles = 16px
     margin: ($spaceBetweenTiles/2)
     position: relative
     text-decoration: none
+    word-wrap: break-word
 
     &.tile
       background-size: auto
@@ -55,7 +69,7 @@ $spaceBetweenTiles = 16px
 
     .label
       font-weight: normal
-      line-height:90px
+      line-height: 56px
 
     :hover
       background-color:#939393
@@ -94,13 +108,41 @@ $spaceBetweenTiles = 16px
   .is-star-active
     color: white
 
+  .fa-clone
+    position: absolute;
+    bottom: 0
+    font-size: 14px
+    height: 18px
+    line-height: 18px
+    opacity: 0
+    right: 0
+    padding: 9px 9px
+    transition-duration: .15s
+    transition-property: color, font-size, background
+
+  .fa-archive
+    position: absolute;
+    bottom: 0
+    font-size: 14px
+    height: 18px
+    line-height: 18px
+    opacity: 0
+    left: 0
+    padding: 9px 9px
+    transition-duration: .15s
+    transition-property: color, font-size, background
+
   li:hover a
     &:hover
       .fa-star,
+      .fa-clone,
+      .fa-archive,
       .fa-star-o
         color: white
 
     .fa-star,
+    .fa-clone,
+    .fa-archive,
     .fa-star-o
       color: white
       opacity: .75
@@ -133,6 +175,7 @@ $spaceBetweenTiles = 16px
       padding-right: 6px
 
     .background-box
+      color: white
       border-radius: 3px
       background-size: cover
       display: block
@@ -154,16 +197,33 @@ $spaceBetweenTiles = 16px
     overflow: scroll
 
     li
-      width: 33.3%
+      width: 50%
 
     .board-list-item
       overflow: hidden
+      height: 8rem
 
     .board-list-item-sub-name
       position: relative
       top: -100px
       left: -100px
 
+    .board-handle
+      position: absolute
+      padding: 7px
+      top: 50%
+      transform: translateY(-50%)
+      right: 10px
+      font-size: 24px
+
 @media screen and (max-width: 360px)
     li
-      width: 50%
+      width: 100%
+
+    .board-handle
+      position: absolute
+      padding: 7px
+      top: 50%
+      transform: translateY(-50%)
+      right: 10px
+      font-size: 24px
