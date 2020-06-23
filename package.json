@@ -75,6 +75,7 @@
     "page": "^1.11.5",
     "papaparse": "^5.2.0",
     "qs": "^6.9.4",
+    "simpl-schema": "^1.7.3",
     "source-map-support": "^0.5.19",
     "xss": "^1.0.6"
   }
