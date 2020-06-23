@@ -82,12 +82,6 @@ momentjs:moment@2.22.2
 browser-policy-framing@1.1.0
 mquandalle:moment
 msavin:usercache
-
-tjaisson:accounts-entcore
-tjaisson:accounts-entcore-ui
-tjaisson:accounts-entcore-direct
-tjaisson:accounts-entcore-multi
-
 wekan-scrollbar
 mquandalle:perfect-scrollbar
 mdg:meteor-apm-agent@3.2.0-rc.0!
@@ -105,3 +99,9 @@ easylogic:summernote
 cfs:filesystem
 ostrio:cookies
 tmeasday:check-npm-versions
+
+# entcore
+tjaisson:accounts-entcore
+tjaisson:accounts-entcore-ui
+tjaisson:accounts-entcore-direct
+tjaisson:accounts-entcore-multi
